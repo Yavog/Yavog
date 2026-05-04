@@ -1,6 +1,7 @@
 #pragma once 
 #include <bit>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <assert.h>
@@ -33,6 +34,10 @@ class BinaryData
     std::vector<char> content;
     size_t i = 0;
 public:
+    
+    const std::vector<char>& getContent()const{
+        return content;
+    }
     [[nodiscard]] bool writeToFile(std::filesystem::path path){
         return writeFile(path,content);      
     }
@@ -155,5 +160,9 @@ public:
     }
     void   writef64(double data){
         write<double>(data);
+    }
+
+    void writeBinaryData(const BinaryData& bd){
+        writeBytes(bd.getContent());
     }
 };

@@ -1,5 +1,6 @@
 
 
+#include "Data/BinaryData.hpp"
 #include "GLFW/glfw3.h"
 #include "client/FPSMessurement.hpp"
 #include "glm/ext/vector_float2.hpp"
@@ -27,6 +28,7 @@
 #include <ratio>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "client/Game.hpp"
 #include "vulkan_old/Image.hpp"
@@ -186,13 +188,23 @@ struct Client{
         }
         return true;
     }
-    void sendUsername(std::u8string string){
+    void send(BinaryData& bd){
         size_t transmitted;
         size_t index = 0;
-        while (index < string.size()) {
-            socket.send((char*)string.data()+index, string.size()-index, transmitted);
+        
+        BinaryData bd2;
+        bd2.writeVarUint(bd.getContent().size());
+        bd2.writeBinaryData(bd);
+
+        while (index < bd2.getContent().size()) {
+            socket.send((char*)bd2.getContent().data()+index, bd2.getContent().size()-index, transmitted);
             index += transmitted;
         }
+    }
+    void sendUsername(std::u8string string){
+        BinaryData bd;
+        bd.writeString(string);
+        send(bd);
     }
         //     while (socket.exist()) {
         //     char buff[1000];
