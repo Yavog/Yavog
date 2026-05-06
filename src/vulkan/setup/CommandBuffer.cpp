@@ -1,5 +1,5 @@
 #include "CommandBuffer.hpp"
-#include "vulkan/DepthBuffer.hpp"
+#include "vulkan/window/DepthBuffer.hpp"
 
 
 CommandBuffer::CommandBuffer(CommandPool& pool){

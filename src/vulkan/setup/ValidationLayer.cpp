@@ -1,5 +1,4 @@
 #include "ValidationLayer.hpp"
-#include <ranges>
 
 ValidationLayer::ValidationLayer(InstanceSettings* settings)
 {

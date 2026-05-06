@@ -16,7 +16,6 @@ public:
     void begin();
     void end();
     
-    //helper (TODO: maybe into Image.hpp?)
     void transition_image_layout(
         const vk::Image& image,
 	    vk::ImageLayout         old_layout,

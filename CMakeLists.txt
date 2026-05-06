@@ -14,7 +14,10 @@ endif()
 # sources
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
        ${PROJECT_SOURCE_DIR}/src/**.cpp
-       ${PROJECT_SOURCE_DIR}/src/**.c)
+       ${PROJECT_SOURCE_DIR}/src/**.c
+       ${PROJECT_SOURCE_DIR}/unrefactored/**.cpp
+       ${PROJECT_SOURCE_DIR}/unrefactored/**.c
+       )
 
 if(WIN32)
        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/windows)
@@ -97,7 +100,7 @@ link_directories(${CMAKE_SOURCE_DIR}/libs/lib)
 
 # Add executable target with source files listed in SOURCE_FILES variable
 add_executable (YAVOG ${SOURCE_FILES})
-target_include_directories(YAVOG PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(YAVOG PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/unrefactored ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(YAVOG glfw)
 target_link_libraries(YAVOG vulkan)
 target_link_libraries(YAVOG glm)
