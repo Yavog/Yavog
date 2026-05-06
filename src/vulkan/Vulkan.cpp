@@ -41,4 +41,6 @@ Vulkan::Vulkan():
     commandPool.create(device,queue);
     render.create(commandPool,swapchain);
     depthBuffer.create(&render,commandPool,swapchain);
+
+    std::cout << "Selected GPU:" << device.physicalDevice.getProperties().deviceName << std::endl;
 }
