@@ -116,7 +116,7 @@ public:
     void create(Setup& setup);
     void draw(Setup& setup);
 };
-struct Server{
+struct Server2{
     TcpListener listener;
     void start(std::u32string ipAddress){
         SocketPoll poll;
@@ -167,7 +167,7 @@ std::u8string toUTF8(std::u32string u32address)
     }
     return u8address;
 }
-Server server;
+Server2 server;
 struct Client{
     TcpSocket socket;
     bool join(std::u32string u32address){

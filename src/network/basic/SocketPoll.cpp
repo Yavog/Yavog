@@ -32,7 +32,7 @@ void SocketPoll::remove(SocketBase& socket){
     remove(handle);
 }
 void SocketPoll::remove(int handle){
-    if(handle2Index.find(handle)!=handle2Index.end())
+    if(handle2Index.find(handle)==handle2Index.end())
         return;
     // swap remove
     int index = handle2Index[handle];

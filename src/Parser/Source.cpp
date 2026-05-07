@@ -3,7 +3,7 @@
 #include <iostream>
 #include <regex>
 
-Source::Source(std::string origin,std::string content):origin(origin){
+Source::Source(std::string origin,std::string content):origin(origin),content(content){
 	lineStart.push_back(0);
 	for (size_t i = 0; i < content.size(); i++){
 		if(content[i] == '\n'){
@@ -11,6 +11,10 @@ Source::Source(std::string origin,std::string content):origin(origin){
 		}
 	}
 }
+std::string Source::getOrigin()const{
+	return origin;
+}
+
 Source::Position Source::getline(size_t i){
 	auto it = std::upper_bound(lineStart.begin(),lineStart.end(),i);
 	if(it != lineStart.begin()){

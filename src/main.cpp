@@ -4,8 +4,14 @@
 #include <iostream>
 #include "App.hpp"
 
+int experimentServer();
+int experimentParser();
 
 int main(int argc, char const *argv[]){    
+    setlocale(LC_ALL, "en_US.utf8");
+    
+    return experimentParser();
+    
     time_t t;
     time(&t);
     srand(t);

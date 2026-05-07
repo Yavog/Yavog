@@ -10,6 +10,7 @@ public:
 	std::string content;
 
 	Source(std::string origin,std::string content);
+	std::string getOrigin()const;
 
 	struct Position{
 		size_t line;
@@ -26,7 +27,6 @@ public:
 	void ref    (size_t i,size_t length,std::string msg);
 
 	void printCodeSection(size_t i,size_t length,std::string msg);
-
 };
 
 
