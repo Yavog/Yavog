@@ -19,6 +19,8 @@ enum class TokenType{
 };
 class Token
 {
+    friend class TokenIterator;
+
     //debug data
     SourceId sourceId = -1;
     size_t   start;    

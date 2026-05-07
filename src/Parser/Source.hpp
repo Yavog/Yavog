@@ -26,6 +26,8 @@ public:
 	void hint   (size_t i,size_t length,std::string msg);
 	void ref    (size_t i,size_t length,std::string msg);
 
+	//TODO: have multiline codeblocks
+	//TODO: show multiple messages. interreferencing each other.
 	void printCodeSection(size_t i,size_t length,std::string msg);
 };
 

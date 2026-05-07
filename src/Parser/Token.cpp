@@ -161,7 +161,7 @@ std::string Token::toUTF8(std::int64_t v){
     }
     size_t i = 0;
     while(v!=0){
-        rv[i++] |= v & 0x3F + 0x80;
+        rv[i++] |= (v & 0x3F) + 0x80;
         v>>=6;
     }
     std::reverse(rv.begin(), rv.end());
@@ -783,8 +783,10 @@ bool Token::loadComment(LexInfo&i,std::string& preComment){
         i++;
         while(i){
             comment += i++;
-            if(i == '\n')
+            if(i == '\n'){
+                comment += i;
                 break;
+            }
         }
     }
     // Multiline comment

@@ -31,7 +31,7 @@ bool writeFile(const std::filesystem::path& filename,std::vector<char> data){
     file.close();
     return true;
 }
-void writeFileOrThrow(std::vector<char> data,const std::filesystem::path& filename){
+void writeFileOrThrow(const std::filesystem::path& filename,std::vector<char> data){
     if(!writeFile(filename,data)){
         throw std::runtime_error("failed to write file :"+filename.string());
     }
