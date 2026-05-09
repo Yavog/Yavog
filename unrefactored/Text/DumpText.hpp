@@ -53,6 +53,7 @@ class Text{
     struct VertexBuffer:public Buffer{
         
         size_t vertexCount;
+        ~VertexBuffer()=default;
     };
     std::shared_ptr<VertexBuffer> buffer;
 public:
@@ -63,8 +64,10 @@ public:
     void setString(Font& font,CommandPool& pool,RenderSync* render,std::u8string_view string);
     
     void draw(CommandBuffer& CB){
-        CB.commandBuffer.bindVertexBuffers(0, *buffer->buffer, {0});
-        CB.commandBuffer.draw(static_cast<uint32_t>(buffer->vertexCount), 1, 0, 0);
+        if(buffer->vertexCount){
+            CB.commandBuffer.bindVertexBuffers(0, *buffer->buffer, {0});
+            CB.commandBuffer.draw(static_cast<uint32_t>(buffer->vertexCount), 1, 0, 0);
+        }
     }
 };
 

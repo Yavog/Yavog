@@ -44,3 +44,6 @@ Vulkan::Vulkan():
 
     std::cout << "Selected GPU:" << device.physicalDevice.getProperties().deviceName << std::endl;
 }
+Vulkan::~Vulkan(){
+    window.inputHandler.reset();
+}

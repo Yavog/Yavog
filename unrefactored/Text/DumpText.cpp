@@ -246,8 +246,9 @@ void Text::setString(Font& font,CommandPool& pool,RenderSync* render ,std::u32st
     }
 
     auto newBuffer = std::make_shared<VertexBuffer>();
-    newBuffer->createAndUpload(render,pool, vertices.data(), vertices.size()*sizeof(Vertex),vk::BufferUsageFlagBits::eVertexBuffer);
-    newBuffer->vertexCount = vertices.size();
-
+    if(vertices.size()){
+        newBuffer->createAndUpload(render,pool, vertices.data(), vertices.size()*sizeof(Vertex),vk::BufferUsageFlagBits::eVertexBuffer);
+    }
+    newBuffer->vertexCount = vertices.size();   
     buffer = newBuffer;
 }

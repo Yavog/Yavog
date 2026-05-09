@@ -24,4 +24,5 @@ public:
     DepthBuffer depthBuffer;
 
     Vulkan();
+    ~Vulkan();
 };

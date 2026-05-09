@@ -5,13 +5,6 @@ struct VSInput {
     float2 inTexCoord;
 };
 
-struct UniformBuffer {
-    float4x4 model;
-    float4x4 view;
-    float4x4 proj;
-};
-ConstantBuffer<UniformBuffer> ubo;
-
 struct VertexOutput {
     float4 sv_position : SV_Position;
     float4 color;

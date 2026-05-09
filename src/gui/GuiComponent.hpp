@@ -1,10 +1,93 @@
 #pragma once
+#include "GLFW/glfw3.h"
+#include "Text/DumpText.hpp"
 #include "glm/ext/vector_float2.hpp"
+#include "glm/ext/vector_float4.hpp"
+#include "gui/GuiAsset.hpp"
 #include "vulkan/Vulkan.hpp"
 #include "vulkan/setup/CommandBuffer.hpp"
+#include "vulkan/vulkan.hpp"
 
-class GuiComponent{
-    glm::vec2 position;
-    
-    virtual void draw(Vulkan& vulkan,CommandBuffer& cb)=0;
+class GuiComponent:public InputHandler{
+protected:
+    Vulkan& vulkan;
+    GuiAsset& assets;
+    glm::vec2 size     = glm::vec2(600,400);
+public:
+    glm::vec2 position = glm::vec2(100,100);
+    GuiComponent(Vulkan& vulkan,GuiAsset& assets):vulkan(vulkan),assets(assets){}
+    virtual void draw(CommandBuffer& cb)=0;
+    bool isHover(glm::vec2 mousePosition){
+        return (position.x <= mousePosition.x && mousePosition.x <= position.x + size.x && position.y <= mousePosition.y && mousePosition.y <= position.y + size.y);
+    }
+};
+
+
+class Button:public GuiComponent{
+public:
+    Button(Vulkan &vulkan, GuiAsset &assets):GuiComponent(vulkan,assets){}
+    virtual void draw(CommandBuffer& cb)override{
+        assets.dsDefault.bind(vulkan.device, cb.commandBuffer, vulkan.render, assets.pipelineDefault);
+        glm::vec2 screenSize = glm::vec2(vulkan.swapchain.swapChainExtent.width,vulkan.swapchain.swapChainExtent.height);
+        assets.constantDefault.use(cb, assets.pipelineDefault, GuiAsset::ConstantBlock{
+            .pos =  position/screenSize,
+            .size = size/screenSize
+        });
+        cb.commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, assets.pipelineDefault.graphicsPipeline);
+        cb.commandBuffer.bindVertexBuffers(0, *assets.rectangleVB.buffer, {0});
+        cb.commandBuffer.bindIndexBuffer(*assets.rectangleIB.buffer, 0, vk::IndexType::eUint16);
+        cb.commandBuffer.drawIndexed(6 /*TODO: indexBuffer->count*/, 1, 0, 0, 0);
+    }
+    virtual bool receive(const Event& event)override{
+        return false;
+    }
+};
+
+struct TextGui:public GuiComponent{
+public:
+    glm::vec4 color = glm::vec4(1);
+    Text text;
+
+    TextGui(Vulkan &vulkan, GuiAsset &assets):GuiComponent(vulkan,assets){}
+    virtual void draw(CommandBuffer& cb)override{
+        assets.dsText.bind(vulkan.device,cb.commandBuffer,vulkan.render,assets.pipelineText);
+        cb.commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *assets.pipelineText.graphicsPipeline);
+        
+        glm::vec2 screenSize = glm::vec2(vulkan.swapchain.swapChainExtent.width,vulkan.swapchain.swapChainExtent.height);
+        assets.constantText.use(cb,assets.pipelineText,GuiAsset::ConstantBlockText(screenSize,position,glm::vec2(size.y),assets.font,color));
+        
+        size.x = size.y*text.width;
+        text.draw(cb);
+    }
+
+    void setSize(double y){
+        size.y = y;
+    }
+    virtual bool receive(const Event& event)override{
+        if(std::holds_alternative<Event::Char>(event.value)){
+            auto ev = std::get<Event::Char>(event.value);
+            std::cout << ev.codepoint << std::endl;
+            text.setString(assets.font, vulkan.commandPool, &vulkan.render, 
+                text.string+(char32_t)ev.codepoint
+            );
+            return true;
+        }
+        if(std::holds_alternative<Event::Key>(event.value)){
+            auto ev = std::get<Event::Key>(event.value);
+            if(ev.action == GLFW_PRESS || ev.action == GLFW_REPEAT){
+                if(ev.key == GLFW_KEY_BACKSPACE){
+                    if(text.string.size()){
+                        text.setString(assets.font, vulkan.commandPool, &vulkan.render, 
+                            text.string.substr(0,text.string.size()-1)
+                        );
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        return false;
+    }
+
 };

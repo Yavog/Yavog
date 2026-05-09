@@ -4,9 +4,13 @@
 #include "Parser/TokenIterator.hpp"
 #include <X11/XKBlib.h>
 #include <cassert>
+#include <iomanip>
+#include <ios>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
+
 class Json{
 public:
     enum JsonType{
@@ -265,8 +269,11 @@ public:
             str += escapeString(string); 
         else if(type == JsonType::NUMBER_INT)
             str += std::to_string(_int);    
-        else if(type == JsonType::NUMBER_DOUBLE)
-            str += std::to_string(_double);    
+        else if(type == JsonType::NUMBER_DOUBLE){
+            std::ostringstream oss;
+            oss << std::scientific << _double;
+            str += oss.str();    
+        }
         else if(type == JsonType::TRUE)
             str += "true";
         else if(type == JsonType::FALSE)
