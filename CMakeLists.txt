@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.13)  
 include(FetchContent)
 project(YAVOG)
-set(CMAKE_CXX_STANDARD 20)           
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       add_compile_options(-m64 -Wa,-mbig-obj)
@@ -64,13 +65,13 @@ if(WIN32)
   FetchContent_Declare(
     vulkan_headers
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
-    GIT_TAG v1.3.280
+    GIT_TAG v1.4.341
   )
   FetchContent_MakeAvailable(vulkan_headers)
   FetchContent_Declare(
     vulkan_loader
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader.git
-    GIT_TAG v1.3.280
+    GIT_TAG v1.4.341
   )
   FetchContent_MakeAvailable(vulkan_loader)
   message("${vulkan_headers_SOURCE_DIR}/include")
