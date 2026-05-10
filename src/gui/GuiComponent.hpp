@@ -20,6 +20,9 @@ public:
     bool isHover(glm::vec2 mousePosition){
         return (position.x <= mousePosition.x && mousePosition.x <= position.x + size.x && position.y <= mousePosition.y && mousePosition.y <= position.y + size.y);
     }
+    glm::vec2 getSize()const{
+        return size;
+    }
 };
 
 
