@@ -66,7 +66,7 @@ struct GuiAsset{
         pipelineDefault.create(
             &vulkan.render,
             vulkan.device,
-            projectDir/"bin"/"gui.spv",
+            projectDir/"bin"/"shaders"/"gui.spv",
             "vertMain",
             "fragMain",
             vulkan.swapchain,
@@ -76,7 +76,7 @@ struct GuiAsset{
         pipelineText.create(
             &vulkan.render,
             vulkan.device,
-            projectDir/"bin"/"text.spv",
+            projectDir/"bin"/"shaders"/"text.spv",
             "vertMain",
             "fragMain",
             vulkan.swapchain,
