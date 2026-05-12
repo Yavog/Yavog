@@ -133,21 +133,21 @@ endif()
 # shaders
 function (add_slang_shader_target TARGET)
   cmake_parse_arguments ("SHADER" "" "OUT" "SOURCES" ${ARGN})
-  set (SHADERS_DIR ${CMAKE_CURRENT_LIST_DIR}/shaders)
+  set (SHADERS_DIR ${BIN_OUTPUT_DIRECTORY}/shaders)
   set (ENTRY_POINTS -entry vertMain -entry fragMain)
   add_custom_command (
           OUTPUT ${SHADERS_DIR}
           COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADERS_DIR}
   )
   add_custom_command (
-          OUTPUT  ${BIN_OUTPUT_DIRECTORY}/${SHADER_OUT}.spv
-          COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_3 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o ${BIN_OUTPUT_DIRECTORY}/${SHADER_OUT}.spv
+          OUTPUT  ${SHADERS_DIR}/${SHADER_OUT}.spv
+          COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} ${SLANGC_EXECUTABLE} ${SHADER_SOURCES} -target spirv -profile spirv_1_3 -emit-spirv-directly -fvk-use-entrypoint-name ${ENTRY_POINTS} -o ${SHADERS_DIR}/${SHADER_OUT}.spv
           WORKING_DIRECTORY ${SHADERS_DIR}
           DEPENDS ${SHADERS_DIR} ${SHADER_SOURCES} ${slang}
           COMMENT "Compiling Slang Shaders"
           VERBATIM
   )
-  add_custom_target (${TARGET} DEPENDS ${BIN_OUTPUT_DIRECTORY}/${SHADER_OUT}.spv)
+  add_custom_target (${TARGET} DEPENDS ${SHADERS_DIR}/${SHADER_OUT}.spv )
 endfunction()
 
 

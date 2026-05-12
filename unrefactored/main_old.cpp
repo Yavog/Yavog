@@ -410,11 +410,11 @@ void GuiSystem::create(Setup& stp){
         dsTexture.setResource(1, font.image);
         
         pushConstant.create(vk::ShaderStageFlagBits::eVertex,0,sizeof(PushConstantBlock));
-        pipeline.create(stp.render,stp.device,stp.projectBaseDir/"bin"/"gui.spv",
+        pipeline.create(stp.render,stp.device,stp.projectBaseDir/"bin"/"shaders"/"gui.spv",
             "vertMain","fragMain",stp.swapchain,dsLayout,stp.depthBuffer,false,&pushConstant
         );
         pushConstantText.create(vk::ShaderStageFlagBits::eVertex,0,sizeof(PushConstantBlockText));
-        pipelineText.create(stp.render,stp.device,stp.projectBaseDir/"bin"/"text.spv",
+        pipelineText.create(stp.render,stp.device,stp.projectBaseDir/"bin"/"shaders"/"text.spv",
             "vertMain","fragMain",stp.swapchain,dsLayout,stp.depthBuffer,false,&pushConstantText
         );
         setScreen(stp,std::make_shared<MainMenu>());
@@ -534,7 +534,7 @@ struct WorldRenderer{
 
         depthBuffer.create(&_game.render,_game.commandPool,_game.swapchain);
         pipeline.create(&_game.render,_game.device,
-            projectBaseDir/"bin"/"slang.spv",
+            projectBaseDir/"bin"/"shaders"/"slang.spv",
             "vertMain","fragMain",
             _game.swapchain, dsLayout,depthBuffer);
 

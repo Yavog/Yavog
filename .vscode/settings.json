@@ -74,6 +74,6 @@
         "--background-index",
         "--clang-tidy",
         "--completion-style=detailed",
-        "--compile-commands-dir=build/windows"
+        "--compile-commands-dir=build/linux"
     ]
 }
