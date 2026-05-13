@@ -1,13 +1,11 @@
 
 
-#include "data/BinaryData.hpp"
 #include "GLFW/glfw3.h"
 #include "client/FPSMessurement.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float4.hpp"
-#include "network/basic/SocketPoll.hpp"
-#include "network/basic/TcpListener.hpp"
-#include "network/basic/TcpSocket.hpp"
+#include "server/Client.hpp"
+#include "server/Server.hpp"
 #include "vulkan/draw/DescriptorLayout.hpp"
 #include "vulkan/setup/Instance.hpp"
 #include "vulkan/window/Window.hpp"
@@ -23,7 +21,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cuchar>
-#include <linux/input-event-codes.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -116,104 +113,9 @@ public:
     void create(Setup& setup);
     void draw(Setup& setup);
 };
-struct Server2{
-    TcpListener listener;
-    void start(std::u32string ipAddress){
-        SocketPoll poll;
-        listener.listen(u8"5555");
-        poll.add(listener);
 
-        TcpSocket client;
-        while(true){
-            if(poll.wait()){
-                if(poll.isWriteable(listener)||poll.isReadable(listener)){
-                    std::string ipAddr;
-                    int port;
-                    listener.accept(client,  ipAddr, port);
-                    poll.add(client);
-                }
-                if (poll.isReadable(client)||poll.isWriteable(client)) {
-                
-                    char buffer[1000];
-                    size_t received;
-                    if(client.recv(buffer, 1000, received)){
-                        std::cout << std::string(buffer,buffer+received)<<std::endl;
-                    }
-                }
-                std::cout << ".";
-
-            }
-
-        }
-    }
-};
-std::u8string toUTF8(std::u32string u32address)
-{
-    std::u8string u8address;
-
-    setlocale(LC_ALL, "en_US.utf8");
-    char buffer[MB_CUR_MAX];
-    std::mbstate_t state{}; 
-            
-    for (auto& c32: u32address) {
-        if(size_t rc = std::c32rtomb(buffer, c32, &state))
-        {
-            if (rc == (std::size_t) - 1)
-                break;
-            if (rc == (std::size_t) - 2)
-                break;
-            u8address += std::u8string(buffer,buffer+rc);
-        }
-    }
-    return u8address;
-}
-Server2 server;
-struct Client2{
-    TcpSocket socket;
-    bool join(std::u32string u32address){
-        //convert u32 to u8string:
-        std::u8string u8address = toUTF8(u32address);
-        
-        size_t split = u8address.find(':');
-        std::u8string ip = u8address.substr(0,split); 
-        std::u8string port = u8"5555";  
-        if(split!=std::string::npos){
-            port = u8address.substr(split+1);
-        }
-        if(!socket.connect(ip, port)){
-            std::cout << "failed to connect to "<<(char*)ip.c_str()<<" "<<(char*)port.c_str() << std::endl;
-            return false;
-        }
-        return true;
-    }
-    void send(BinaryData& bd){
-        size_t transmitted;
-        size_t index = 0;
-        
-        BinaryData bd2;
-        bd2.writeVarUint(bd.getContent().size());
-        bd2.writeBinaryData(bd);
-
-        while (index < bd2.getContent().size()) {
-            socket.send((char*)bd2.getContent().data()+index, bd2.getContent().size()-index, transmitted);
-            index += transmitted;
-        }
-    }
-    void sendUsername(std::u8string string){
-        BinaryData bd;
-        bd.writeString(string);
-        send(bd);
-    }
-        //     while (socket.exist()) {
-        //     char buff[1000];
-        //     size_t received;
-        //     if(socket.recv(buff, 1000, received)){
-        //         std::cout << std::string(buff,buff+received) <<std::endl;
-        //     }
-
-        // }
-};
-Client2 client;
+Server server;
+ClientNetworkConnection client;
 
 
 
@@ -284,12 +186,13 @@ class MultiplayerMenu:public Screen{
                         selected->string.clear();
                     }else if(i==2){
                         if(client.join(ipAddressLabel.string)){
-                            client.sendUsername(toUTF8(nameLabel.string));
+                            //client.sendUsername(toUTF8(nameLabel.string));
                             gs.setScreen(stp, std::make_shared<class MultiplayerLobby>());
                             return;
                         }
                     }else if(i==3){
-                        server.start(ipAddressLabel.string);
+                        auto u8str = ClientNetworkConnection::toUTF8(ipAddressLabel.string);
+                        server.listen(std::stoi(std::string(u8str.begin(),u8str.end())));
                     }else if(i==4){
                         gs.setScreen(stp, std::make_shared<class MainMenu>());
                         return;

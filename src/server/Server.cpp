@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
 #include <thread>
@@ -43,7 +44,8 @@ void Server::run(std::stop_token stoken,size_t port){
                 con.con = std::make_shared<Connection>();
                 listener.accept(con.client,  ipAddr, port);
                 poll.add(con.client,false,true);
-
+                
+                std::lock_guard lock(mutex);
                 players.push_back({
                     con.con
                 });
@@ -110,6 +112,7 @@ void Server::listen(size_t port){
     networkThread = std::jthread(&Server::run,this, port);
 }
 void Server::update(){
+    std::lock_guard lock(mutex);
     for (size_t i = 0; i < players.size();) {
         auto& player = players[i];
 
@@ -133,3 +136,10 @@ void Server::update(){
         i++;
     }
 }
+void Server::addPlayer(std::shared_ptr<Connection> con){
+    std::lock_guard lock(mutex);
+    Player player;
+    player.con = con;
+    players.push_back(player);
+}    
+

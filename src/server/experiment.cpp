@@ -30,15 +30,28 @@ void client(std::stop_token token){
     }
 
 }
-
 int experimentServer(){
+    std::shared_ptr<Connection> host2 = std::make_shared<Connection>();
     {
         Server server;
+        {
+            server.addPlayer(host2);
+        }
         server.listen(5555);
         
         std::jthread j(client);
+        BinaryData bd;
+        bd.writeString(u8"Hello world!");
+        host2->toServer.send(bd);
         while(true){
             server.update();
+            if(auto _bd = host2->toClient.recv(); _bd.has_value()){
+                auto bd = _bd.value();
+                std::u8string u8str;
+                bd.readString(u8str);
+                std::string str(u8str.begin(),u8str.end());
+                std::cout << str << std::endl;
+            }
         }
     }
     return 0;

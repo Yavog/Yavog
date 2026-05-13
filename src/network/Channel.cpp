@@ -12,6 +12,7 @@ bool Channel4TwoThread::send(const BinaryData& bd){
         return false;
 
     buffer[currentTail] = bd;
+    buffer[currentTail].resetHead();
     
     tail.store((currentTail+1)%capacity,std::memory_order_release);
     return true;

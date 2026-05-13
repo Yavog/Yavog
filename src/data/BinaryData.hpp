@@ -34,7 +34,9 @@ class BinaryData
     std::vector<char> content;
     size_t i = 0;
 public:
-    
+    void resetHead(){
+        i = 0;
+    }
     const std::vector<char>& getContent()const{
         return content;
     }

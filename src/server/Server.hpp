@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <stop_token>
 #include <thread>
@@ -24,6 +25,7 @@ struct Player{
 };
 
 class Server{
+    //all of this  is owned by the network thread
     struct NetworkConnection{
         std::shared_ptr<Connection> con;
         TcpSocket client;
@@ -34,10 +36,12 @@ class Server{
 
     void run(std::stop_token stoken,size_t port);
     std::jthread networkThread;
-public:
+    //this is owned by the update thread
     std::vector<Player> players;
+    std::mutex mutex;
+public:
 
     void listen(std::size_t port);   
-    
+    void addPlayer(std::shared_ptr<Connection> con);    
     void update();
 };
