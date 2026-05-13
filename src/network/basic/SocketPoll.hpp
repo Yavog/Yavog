@@ -30,6 +30,9 @@ public:
     void remove(SocketBase& socket);
     void remove(int socket);
 
+    void addWrite   (SocketBase& socket);
+    void removeWrite(SocketBase& socket);
+    
     bool isWriteable(SocketBase& socket);
     bool isReadable (SocketBase& socket);
 };

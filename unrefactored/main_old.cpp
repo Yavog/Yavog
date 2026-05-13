@@ -168,7 +168,7 @@ std::u8string toUTF8(std::u32string u32address)
     return u8address;
 }
 Server2 server;
-struct Client{
+struct Client2{
     TcpSocket socket;
     bool join(std::u32string u32address){
         //convert u32 to u8string:
@@ -213,7 +213,7 @@ struct Client{
 
         // }
 };
-Client client;
+Client2 client;
 
 
 

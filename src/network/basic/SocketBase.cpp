@@ -1,5 +1,6 @@
 #include "SocketBase.hpp"
 #include <mutex>
+#include <unistd.h>
 
 #ifdef WIN32
 static std::mutex mutex;
@@ -30,6 +31,21 @@ SOCKET SocketBase::getHandle(){
 }
 SocketBase::SocketBase(/* args */){
 }
+SocketBase::SocketBase(SocketBase&& other)noexcept{
+    this->handle     = other.handle;
+    this->receivable = other.receivable;
+    this->sendable   = other.sendable;
+
+    other.handle = INVALID_SOCKET;
+}
+SocketBase& SocketBase::operator=(SocketBase&& other) noexcept{
+    if(this != &other){
+        this->close();
+    }
+    std::swap(handle,other.handle);
+    return *this;
+}
+
 
 SocketBase::~SocketBase()
 {

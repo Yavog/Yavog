@@ -43,6 +43,32 @@ void SocketPoll::remove(int handle){
     handle2Index.erase(handle);
 }
 
+void SocketPoll::addWrite   (SocketBase& socket){
+    auto handle = socket.getHandle();
+    POLLFD* p = nullptr;
+    if(handle2Index.find(handle) == handle2Index.end()){
+        // doesn't exists
+        return add(socket,true,false);
+    }
+    // exists
+    int index = handle2Index[handle]; 
+    p = &connections.at(index);
+    p->events |= POLLWRNORM;
+}
+void SocketPoll::removeWrite(SocketBase& socket){
+    auto handle = socket.getHandle();
+    POLLFD* p = nullptr;
+    if(handle2Index.find(handle) == handle2Index.end()){
+        // doesn't exists
+        return;
+    }
+    // exists
+    int index = handle2Index[handle]; 
+    p = &connections.at(index);
+    p->events &= ~POLLWRNORM;
+}
+    
+
 bool SocketPoll::wait(size_t ms){
     //reset everything
     for (auto &&con : connections){

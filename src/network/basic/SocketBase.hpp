@@ -40,8 +40,15 @@ protected:
 
 public:
 
-    SocketBase(/* args */);
+    SocketBase();
     virtual ~SocketBase();
+
+    SocketBase(const SocketBase&)=delete;
+    SocketBase& operator=(const SocketBase&)=delete;
+
+
+    SocketBase(SocketBase&&)noexcept;
+    SocketBase& operator=(SocketBase&&) noexcept;
 
     void close();
     [[deprecated]] bool shutdown(bool shutdown_read,bool shutdown_write);
