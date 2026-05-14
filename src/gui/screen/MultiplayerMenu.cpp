@@ -17,8 +17,8 @@ void MultiplayerMenu::create(){
 
 
     textHost.setSize(60);
-    textJoin .setSize(60);
-    back            .setSize(60);
+    textJoin.setSize(60);
+    back    .setSize(60);
     
     textHost.position = glm::vec2(660,400);
     textJoin.position = glm::vec2(660,500);

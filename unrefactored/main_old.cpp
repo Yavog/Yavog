@@ -42,14 +42,6 @@
 #include "vulkan/draw/DescriptorLayout.hpp"
 
 
-const std::vector<Vertex> vertices = {
-    {{0,   0,0.f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{1.f, 0,0.f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{1.f, 0,1.f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{0,   0,1.f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
-const std::vector<uint16_t> indices = {
-    0, 3, 2, 2, 1, 0};
-
 FPSMessurement fpsCounter;
 
 MeshWeaver mw;
