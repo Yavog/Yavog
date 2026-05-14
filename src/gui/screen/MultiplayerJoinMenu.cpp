@@ -1,4 +1,4 @@
-#include "MultiplayerHostMenu.hpp"
+#include "MultiplayerJoinMenu.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "gui/screen/MainMenu.hpp"
 #include "gui/screen/MultiplayerMenu.hpp"
@@ -8,44 +8,44 @@
 #include <exception>
 #include <string>
 
-MultiplayerHostMenu::MultiplayerHostMenu(GuiSystem& guiSystem)
-    :GuiScreen(guiSystem),username(gs),port(gs),host(gs),back(gs){
+MultiplayerJoinMenu::MultiplayerJoinMenu(GuiSystem& guiSystem)
+    :GuiScreen(guiSystem),username(gs),serverIp(gs),join(gs),back(gs){
 
 }
-MultiplayerHostMenu::~MultiplayerHostMenu(){
+MultiplayerJoinMenu::~MultiplayerJoinMenu(){
 }
 
-void MultiplayerHostMenu::create(){
+void MultiplayerJoinMenu::create(){
     username.defaultText = u8"Enter name of sacrifice";
-    port.defaultText = u8"Enter Port";
+    serverIp.defaultText = u8"Enter Server Ip";
 
     back    .setString(u8"Back");
-    host    .setString(u8"Host");
+    join    .setString(u8"Join");
     username.setString(u8"");
-    port.setString(u8"");
+    serverIp.setString(u8"");
 
     back    .setSize(60);
-    host    .setSize(60);
+    join    .setSize(60);
     username.setSize(60);
-    port.setSize(60);
+    serverIp.setSize(60);
 
     back    .position = glm::vec2(0,0);
-    host    .position = glm::vec2(1200,900);
+    join    .position = glm::vec2(1200,900);
     username.position = glm::vec2(300,420);
-    port.position = glm::vec2(300,300);
+    serverIp.position = glm::vec2(300,300);
 
     back    .color = colorDefault;
-    host    .color = colorDefault;
+    join    .color = colorDefault;
     username.color = colorEditable;
-    port.color = colorEditable;
+    serverIp.color = colorEditable;
 }
-void MultiplayerHostMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
+void MultiplayerJoinMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
     back    .draw(CB,virtualScreenSize);
-    host    .draw(CB,virtualScreenSize);
+    join    .draw(CB,virtualScreenSize);
     username.draw(CB,virtualScreenSize);
-    port.draw(CB,virtualScreenSize);
+    serverIp.draw(CB,virtualScreenSize);
 
-    TextGui* texts[] = {&username,&port,&host,&back};
+    TextGui* texts[] = {&username,&serverIp,&join,&back};
     TextGui* hovered = nullptr;
     for (auto text : texts) {
         if(text->isHover(mouse)){
@@ -54,23 +54,23 @@ void MultiplayerHostMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
     }
     if(hovered != hoveredText){
         if(hoveredText){
-            if(hoveredText == &back || hoveredText == &host)
+            if(hoveredText == &back || hoveredText == &join)
                 hoveredText->color = colorDefault;
-            if(hoveredText == &username || hoveredText == &port)
+            if(hoveredText == &username || hoveredText == &serverIp)
                 if(hoveredText!=selectedText)
                     hoveredText->color = colorEditable;
         }
         hoveredText = hovered;
         if(hoveredText){
-            if(hoveredText == &back || hoveredText == &host)
+            if(hoveredText == &back || hoveredText == &join)
                 hoveredText->color = colorHovered;
-            if(hoveredText == &username || hoveredText == &port)
+            if(hoveredText == &username || hoveredText == &serverIp)
                 if(hoveredText!=selectedText)
                     hoveredText->color = colorEditableHovered;
         }
     }
 }
-bool MultiplayerHostMenu::receive(const Event& event){
+bool MultiplayerJoinMenu::receive(const Event& event){
     bool received = false;
 
     if(selectedText && selectedText->receive(event))
@@ -82,37 +82,25 @@ bool MultiplayerHostMenu::receive(const Event& event){
             if(hoveredText == &back){
                 gs.setScreen(std::make_shared<MultiplayerMenu>(gs));
                 return true;
-            }else if(hoveredText == &host){
+            }else if(hoveredText == &join){
                 if(username.text.string.size() == 0){
                     username.color = colorInvalid;
                     return true;
                 }
-                if(port.text.string.size() == 0){
-                    port.color = colorInvalid;
+                if(serverIp.text.string.size() == 0){
+                    serverIp.color = colorInvalid;
                     return true;
                 }
 
-                auto u8port = ClientNetworkConnection::toUTF8(port.text.string);
-                std::string portStr(u8port.begin(),u8port.end());
-                size_t portNumber;
-                try {
-                    portNumber = std::stoi(portStr);
-                } catch (const std::exception& e) {
-                    port.setString(u8"invalid port");
-                    port.text.string.clear();
-                    port.color = colorInvalid;
+
+                ClientNetworkConnection cnc;
+                if(!cnc.join(serverIp.text.string)){
+                    join.setString(u8"couldn't connect. retry...");
+                    join.text.string.clear();
+                    serverIp.color = colorInvalid;
                     return true;
                 }
-                Server server;
-                if(!server.listen(portNumber)){
-                    port.setString(u8"couldn't use this port.");
-                    port.text.string.clear();
-                    port.color = colorInvalid;
-                    return true;
-                }
-                // while (true) {
-                //     server.update();
-                // }
+
                 gs.setScreen(nullptr);
                 return true;
             }else if(selectedText != hoveredText){

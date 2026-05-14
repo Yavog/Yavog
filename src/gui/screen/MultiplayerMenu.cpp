@@ -2,6 +2,7 @@
 #include "gui/screen/MainMenu.hpp"
 #include "gui/screen/SinglePlayerMenu.hpp"
 #include "gui/screen/MultiplayerHostMenu.hpp"
+#include "gui/screen/MultiplayerJoinMenu.hpp"
 
 MultiplayerMenu::MultiplayerMenu(GuiSystem& guiSystem):
     GuiScreen(guiSystem),textHost(guiSystem),
@@ -65,7 +66,7 @@ bool MultiplayerMenu::receive(const Event& event){
                 gs.setScreen(std::make_shared<MultiplayerHostMenu>(gs));
                 return true;
             }else if(hoveredText == &textJoin){
-                gs.setScreen(std::make_shared<SinglePlayerMenu>(gs));
+                gs.setScreen(std::make_shared<MultiplayerJoinMenu>(gs));
                 return true;
             }else if(hoveredText == &back){
                 gs.setScreen(std::make_shared<MainMenu>(gs));
