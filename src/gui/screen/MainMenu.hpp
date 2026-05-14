@@ -11,7 +11,7 @@
 
 class MainMenu:public GuiScreen{
 public:
-    FPSMessurement fpsCounter;
+    //FPSMessurement fpsCounter;
 
     // Button button;
     // Button button2;

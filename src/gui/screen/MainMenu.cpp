@@ -34,8 +34,8 @@ void MainMenu::create(){
     //textFps         .color = colorDefault;
 }
 void MainMenu::draw(CommandBuffer& CB, glm::vec2 mouse){    
-    fpsCounter.update();
-    std::string fpsString = std::to_string(fpsCounter.currentFPS)+" Hz";
+    //fpsCounter.update();
+    //std::string fpsString = std::to_string(fpsCounter.currentFPS)+" Hz";
     //textFps   .setString(std::u8string(fpsString.begin(),fpsString.end()).c_str());
 
 
