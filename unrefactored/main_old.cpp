@@ -384,8 +384,7 @@ void game(Game2& _game,std::filesystem::path projectBaseDir) {
     DepthBuffer depthBuffer;
     WorldRenderer wr;
     wr.init(_game, projectBaseDir,depthBuffer);
-    GuiSystem* gs = nullptr;
-   
+    
     // TODO refactor the following in the future:
     auto recordCommandBuffer = [&](CommandBuffer& CB,uint32_t frameIndex,uint32_t imageIndex)
     {
@@ -404,27 +403,11 @@ void game(Game2& _game,std::filesystem::path projectBaseDir) {
             .depthBuffer = depthBuffer,
             .buffer = CB
         };
-        if(!gs){
-            gs = new GuiSystem;
-            gs->create(setup);
-        }
-
         wr.draw(_game,CB, frameIndex, imageIndex);
-        if(glfwGetKey(_game.window, GLFW_KEY_P)){
-            delete gs;
-            gs = 0;
-        }
-        if(gs)
-            gs->draw(setup);
-        
             
         _game.swapchain.endRendering(CB,imageIndex);
         CB.end();
     };
-
-
-    
-
 
     while(_game.window.update()){
         glfwPollEvents();
@@ -452,6 +435,5 @@ void game(Game2& _game,std::filesystem::path projectBaseDir) {
         
     }
     _game.device.device.waitIdle();
-    delete gs;
 }
 

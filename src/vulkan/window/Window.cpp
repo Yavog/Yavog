@@ -96,6 +96,19 @@ void Window::create(Instance& instance,int width, int height, const char *title)
                 }
             });
     });
+
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods){
+        auto self = (Window*)glfwGetWindowUserPointer(window);
+        if(self->inputHandler)
+            self->inputHandler->receive({
+                .window = *self,
+                .value  = Event::MouseButton{
+                    .button = button,
+                    .action = action,
+                    .mods   = mods
+                }
+            });
+    });
     toggleMouseGrab();
 }
 void Window::close(){

@@ -33,10 +33,20 @@ void SinglePlayerMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
     back             .draw(CB, virtualScreenSize);
 
     back.color = back.isHover(mouse)?glm::vec4(1):glm::vec4(0.5,0.5,0.5,1);
-    if(glfwGetMouseButton(gs.vulkan.window, GLFW_MOUSE_BUTTON_1)==GLFW_PRESS)
-        if(back.isHover(mouse))
-            return gs.setScreen(std::make_shared<MainMenu>(gs));
+    if(back.isHover(mouse))
+        hoveredText = &back;
+    else 
+        hoveredText = nullptr;  
 }
 bool SinglePlayerMenu::receive(const Event& event){
+    if(std::holds_alternative<Event::MouseButton>(event.value)){
+        auto ev = std::get<Event::MouseButton>(event.value);
+        if(ev.button == GLFW_MOUSE_BUTTON_1 && ev.action == GLFW_PRESS){
+            if(hoveredText == &back){
+                gs.setScreen(std::make_shared<MainMenu>(gs));
+                return true;
+            }
+        }
+    }
     return false;
 }

@@ -1,4 +1,5 @@
 #include "gui/screen/MainMenu.hpp"
+#include "gui/screen/MultiplayerMenu.hpp"
 #include "gui/screen/SinglePlayerMenu.hpp"
 #include "gui/screen/MultiplayerHostMenu.hpp"
 
@@ -72,16 +73,6 @@ void MainMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
         }
     }
     
-
-    if(glfwGetMouseButton(gs.vulkan.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-        if(hoveredText == &textSinglePlayer){
-            gs.setScreen(std::make_shared<SinglePlayerMenu>(gs));
-            return;
-        }else if(hoveredText == &textMultiPlayer){
-            gs.setScreen(std::make_shared<MultiplayerHostMenu>(gs));
-            return;
-        }
-    }
 }
 MainMenu::~MainMenu(){
     
@@ -89,9 +80,20 @@ MainMenu::~MainMenu(){
 bool MainMenu::receive(const Event& event){
     bool received = false;
     
-    if(selectedText)
-        received =  received || selectedText->receive(event);
-    
+    if(selectedText && selectedText->receive(event))
+        return true;
+    if(std::holds_alternative<Event::MouseButton>(event.value)){
+        auto ev = std::get<Event::MouseButton>(event.value);
+        if(ev.button == GLFW_MOUSE_BUTTON_1 && ev.action == GLFW_PRESS){
+            if(hoveredText == &textSinglePlayer){
+                gs.setScreen(std::make_shared<SinglePlayerMenu>(gs));
+                return true;
+            }else if(hoveredText == &textMultiPlayer){
+                gs.setScreen(std::make_shared<MultiplayerMenu>(gs));
+                return true;
+            }
+        }
+    }
 
     return received;
 }

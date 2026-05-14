@@ -15,9 +15,14 @@ struct Event{
     struct Char{
         unsigned int codepoint;
     };
+    struct MouseButton{
+        int button;
+        int action;
+        int mods;
+    };
 
     class Window& window;
-    std::variant<FramebufferSize,Key,Char> value;
+    std::variant<FramebufferSize,Key,Char,MouseButton> value;
     
 };
 

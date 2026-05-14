@@ -19,7 +19,7 @@ void MultiplayerHostMenu::create(){
     port.defaultText = u8"Enter Port";
 
     back    .setString(u8"Back");
-    host    .setString(u8"Light up hell");
+    host    .setString(u8"Host");
     username.setString(u8"");
     port.setString(u8"");
 
@@ -68,61 +68,66 @@ void MultiplayerHostMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
                     hoveredText->color = colorEditableHovered;
         }
     }
-    if(glfwGetMouseButton(gs.vulkan.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-        if(hoveredText == &back){
-            gs.setScreen(std::make_shared<MainMenu>(gs));
-            return;
-        }else if(hoveredText == &host){
-            if(username.text.string.size() == 0){
-                username.color = colorInvalid;
-                return;
-            }
-            if(port.text.string.size() == 0){
-                port.color = colorInvalid;
-                return;
-            }
-
-            auto u8port = ClientNetworkConnection::toUTF8(port.text.string);
-            std::string portStr(u8port.begin(),u8port.end());
-            size_t portNumber;
-            try {
-                portNumber = std::stoi(portStr);
-            } catch (const std::exception& e) {
-                port.setString(u8"invalid port");
-                port.text.string.clear();
-                port.color = colorInvalid;
-                return;
-            }
-            Server server;
-            if(!server.listen(portNumber)){
-                port.setString(u8"couldn't use this port.");
-                port.text.string.clear();
-                port.color = colorInvalid;
-                return;
-            }
-            // while (true) {
-            //     server.update();
-            // }
-            gs.setScreen(nullptr);
-            return;
-        }else if(selectedText != hoveredText){
-            //old
-            if(selectedText){
-                selectedText->color = colorEditable;
-            }
-            selectedText = hoveredText;
-            //new
-            if(selectedText){
-                selectedText->color = colorSelected;
-            }
-        }
-    }
 }
 bool MultiplayerHostMenu::receive(const Event& event){
     bool received = false;
 
-    if(selectedText)
-        received =  received || selectedText->receive(event);
+    if(selectedText && selectedText->receive(event))
+        return true;
     
+    if(std::holds_alternative<Event::MouseButton>(event.value)){
+        auto ev = std::get<Event::MouseButton>(event.value);
+        if(ev.button == GLFW_MOUSE_BUTTON_1 && ev.action == GLFW_PRESS){
+            if(hoveredText == &back){
+                gs.setScreen(std::make_shared<MainMenu>(gs));
+                return true;
+            }else if(hoveredText == &host){
+                if(username.text.string.size() == 0){
+                    username.color = colorInvalid;
+                    return true;
+                }
+                if(port.text.string.size() == 0){
+                    port.color = colorInvalid;
+                    return true;
+                }
+
+                auto u8port = ClientNetworkConnection::toUTF8(port.text.string);
+                std::string portStr(u8port.begin(),u8port.end());
+                size_t portNumber;
+                try {
+                    portNumber = std::stoi(portStr);
+                } catch (const std::exception& e) {
+                    port.setString(u8"invalid port");
+                    port.text.string.clear();
+                    port.color = colorInvalid;
+                    return true;
+                }
+                Server server;
+                if(!server.listen(portNumber)){
+                    port.setString(u8"couldn't use this port.");
+                    port.text.string.clear();
+                    port.color = colorInvalid;
+                    return true;
+                }
+                // while (true) {
+                //     server.update();
+                // }
+                gs.setScreen(nullptr);
+                return true;
+            }else if(selectedText != hoveredText){
+                //old
+                if(selectedText){
+                    selectedText->color = colorEditable;
+                }
+                selectedText = hoveredText;
+                //new
+                if(selectedText){
+                    selectedText->color = colorSelected;
+                    return true;
+                }
+                else return false;
+            }
+        }
+    }
     return received;
 }
