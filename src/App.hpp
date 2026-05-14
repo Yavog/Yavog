@@ -3,6 +3,7 @@
 #include <memory>
 #include "gui/GuiComponent.hpp"
 #include "gui/GuiScreen.hpp"
+#include "gui/GuiSystem.hpp"
 #include "vulkan/Vulkan.hpp"
 
 class App{
@@ -10,7 +11,8 @@ class App{
 public:
     Vulkan vulkan;
 
-    std::shared_ptr<GuiScreen> screen;
+    std::shared_ptr<GuiSystem> guiSystem = std::make_shared<GuiSystem>(vulkan);
+
     App(std::filesystem::path projectDir);
     
     ///@return restart?

@@ -13,13 +13,10 @@ App::App(std::filesystem::path projectDir):projectDir(projectDir){
 
 
 bool App::run(){    
-    GuiAsset assets;
-    assets.create(vulkan,projectDir);
     std::cout<<projectDir<<std::endl;
     
-    screen = std::make_shared<Test>(vulkan,assets);
-    screen->create();
-    vulkan.window.inputHandler = screen;
+    guiSystem->create(projectDir);
+    vulkan.window.inputHandler = guiSystem;
     
     while (vulkan.window.update()) {
         
@@ -45,9 +42,7 @@ bool App::run(){
         
         glfwPollEvents();
 
-        glm::dvec2 mouse;
-        glfwGetCursorPos(vulkan.window, &mouse.x, &mouse.y);
-        screen->draw(CB, mouse);
+        guiSystem->draw(CB);
 
         vulkan.swapchain.endRendering(CB, imageIndex);
         CB.end();

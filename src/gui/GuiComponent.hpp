@@ -4,9 +4,13 @@
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float4.hpp"
 #include "gui/GuiAsset.hpp"
+#include "gui/GuiSystem.hpp"
 #include "vulkan/Vulkan.hpp"
 #include "vulkan/setup/CommandBuffer.hpp"
+#include "vulkan/setup/CommandPool.hpp"
 #include "vulkan/vulkan.hpp"
+#include <string>
+#include <string_view>
 
 class GuiComponent:public InputHandler{
 protected:
@@ -16,7 +20,7 @@ protected:
 public:
     glm::vec2 position = glm::vec2(100,100);
     GuiComponent(Vulkan& vulkan,GuiAsset& assets):vulkan(vulkan),assets(assets){}
-    virtual void draw(CommandBuffer& cb)=0;
+    virtual void draw(CommandBuffer& cb,glm::vec2 screenSize)=0;
     bool isHover(glm::vec2 mousePosition){
         return (position.x <= mousePosition.x && mousePosition.x <= position.x + size.x && position.y <= mousePosition.y && mousePosition.y <= position.y + size.y);
     }
@@ -29,9 +33,8 @@ public:
 class Button:public GuiComponent{
 public:
     Button(Vulkan &vulkan, GuiAsset &assets):GuiComponent(vulkan,assets){}
-    virtual void draw(CommandBuffer& cb)override{
+    virtual void draw(CommandBuffer& cb,glm::vec2 screenSize)override{
         assets.dsDefault.bind(vulkan.device, cb.commandBuffer, vulkan.render, assets.pipelineDefault);
-        glm::vec2 screenSize = glm::vec2(vulkan.swapchain.swapChainExtent.width,vulkan.swapchain.swapChainExtent.height);
         assets.constantDefault.use(cb, assets.pipelineDefault, GuiAsset::ConstantBlock{
             .pos =  position/screenSize,
             .size = size/screenSize
@@ -47,16 +50,16 @@ public:
 };
 
 struct TextGui:public GuiComponent{
+    std::u8string defaultText;
 public:
     glm::vec4 color = glm::vec4(1);
     Text text;
 
-    TextGui(Vulkan &vulkan, GuiAsset &assets):GuiComponent(vulkan,assets){}
-    virtual void draw(CommandBuffer& cb)override{
+    TextGui(GuiSystem& gs):GuiComponent(gs.vulkan,gs.assets){}
+    virtual void draw(CommandBuffer& cb,glm::vec2 screenSize)override{
         assets.dsText.bind(vulkan.device,cb.commandBuffer,vulkan.render,assets.pipelineText);
         cb.commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *assets.pipelineText.graphicsPipeline);
         
-        glm::vec2 screenSize = glm::vec2(vulkan.swapchain.swapChainExtent.width,vulkan.swapchain.swapChainExtent.height);
         assets.constantText.use(cb,assets.pipelineText,GuiAsset::ConstantBlockText(screenSize,position,glm::vec2(size.y),assets.font,color));
         
         size.x = size.y*text.width;
@@ -66,10 +69,31 @@ public:
     void setSize(double y){
         size.y = y;
     }
+
+    void setString(std::string_view str){
+        std::u8string_view u8Str(reinterpret_cast<const char8_t*>(str.data()),str.size());
+        setString(u8Str);
+    }
+    void setString(std::u8string_view str){
+        if(str.size())
+            text.setString(assets.font, vulkan.commandPool, &vulkan.render, str);
+        else {
+            text.setString(assets.font, vulkan.commandPool, &vulkan.render, defaultText);
+            text.string.clear();
+        }
+    }
+    void setString(std::u32string str){
+        if(str.size())
+            text.setString(assets.font, vulkan.commandPool, &vulkan.render, str);
+        else{
+            text.setString(assets.font, vulkan.commandPool, &vulkan.render, defaultText);
+            text.string.clear();
+        }
+    }
+    
     virtual bool receive(const Event& event)override{
         if(std::holds_alternative<Event::Char>(event.value)){
             auto ev = std::get<Event::Char>(event.value);
-            std::cout << ev.codepoint << std::endl;
             text.setString(assets.font, vulkan.commandPool, &vulkan.render, 
                 text.string+(char32_t)ev.codepoint
             );
@@ -80,9 +104,7 @@ public:
             if(ev.action == GLFW_PRESS || ev.action == GLFW_REPEAT){
                 if(ev.key == GLFW_KEY_BACKSPACE){
                     if(text.string.size()){
-                        text.setString(assets.font, vulkan.commandPool, &vulkan.render, 
-                            text.string.substr(0,text.string.size()-1)
-                        );
+                        setString(text.string.substr(0,text.string.size()-1));
                     }
                 }
             }

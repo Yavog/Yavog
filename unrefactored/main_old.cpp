@@ -131,15 +131,7 @@ public:
 
     }
 };
-class MainMenu:public Screen{
-    Text text,text2,text3,text4;
-    std::u32string string;
-    std::chrono::steady_clock::time_point start;
-public:
-    void create(GuiSystem& gs,Setup& stp)override;
-    void draw(GuiSystem& gs,Setup& stp,glm::vec2 relativeMousePosition)override;
-    ~MainMenu();
-};
+
 class MultiplayerMenu:public Screen{
     Text ipAddressLabel;
     Text nameLabel;
@@ -194,7 +186,7 @@ class MultiplayerMenu:public Screen{
                         auto u8str = ClientNetworkConnection::toUTF8(ipAddressLabel.string);
                         server.listen(std::stoi(std::string(u8str.begin(),u8str.end())));
                     }else if(i==4){
-                        gs.setScreen(stp, std::make_shared<class MainMenu>());
+                        gs.setScreen(stp, nullptr);
                         return;
                     }
                 }
@@ -211,92 +203,7 @@ class MultiplayerMenu:public Screen{
     }
 };
 
-void MainMenu::create(GuiSystem& gs,Setup& stp){
-        
-        text.setString( gs.font, stp.pool, stp.render , u8"Suffer alone    😈");
-        text2.setString(gs.font, stp.pool, stp.render, u8"Suffer together 😈 😈");
-        text3.setString(gs.font, stp.pool, stp.render, u8"Exit");
-        text4.setString(gs.font, stp.pool, stp.render, u8"Hz");
-        
-        start = std::chrono::steady_clock::now();
-    }
-void MainMenu::draw(GuiSystem& gs,Setup& stp,glm::vec2 relativeMousePosition){
-        auto screenSize = glm::vec2(1920,1080);
-        auto mousePosition = relativeMousePosition*screenSize;
 
-        // if(glfwGetKey(stp.window, GLFW_KEY_Y)){
-            
-        //     //char c = 32+rand()%96;
-        //     //font.getGlyph(pool, render.getFrameIndex(), c);
-            
-        //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        //     // while(glfwGetKey(window, GLFW_KEY_Y)){
-        //     //     glfwWaitEvents();
-        //     // }
-        //     text.setString(gs.font, stp.pool, stp.render, u8"hi");
-        // }
-        if(stp.window.textInput.size()){
-            string += stp.window.textInput;
-            stp.window.textInput.clear();
-            text.setString(gs.font,stp.pool, stp.render, string);
-        }
-
-        auto& commandBuffer = stp.buffer.commandBuffer;
-        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *gs.pipelineText.graphicsPipeline);
-        gs.dsTexture.bind(stp.device,commandBuffer,*stp.render,gs.pipelineText);
-
-        //FPS
-        gs.pushConstantText.use(stp.buffer,gs.pipelineText,GuiSystem::PushConstantBlockText(screenSize,glm::vec2(0),glm::vec2(30),gs.font.texturePacker.getSize(),glm::vec4(1)));
-        text4.draw(stp.buffer);
-        std::string fpsString = std::to_string(fpsCounter.currentFPS)+" Hz";
-        text4.setString(gs.font, stp.pool, stp.render, std::u8string(fpsString.begin(),fpsString.end()).c_str());
-        
-        Text* texts[] = {&text,&text2,&text3};
-        
-        size_t i = 0;
-        for (auto& text : texts) {
-            auto position = glm::vec2(660,400+i*100);
-            auto size = glm::vec2(60,60);
-            auto color = glm::vec4(0.5,0.5,0.5,1);
-            //color = glm::vec4(0.3,0.3,0.7,1); TODO: make editable text blue
-            
-
-
-            if( position.x < mousePosition.x && mousePosition.x < position.x+size.x*text->width && position.y < mousePosition.y && mousePosition.y < position.y+size.y){
-                color = glm::vec4(1);
-                if(glfwGetMouseButton(stp.window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-                    if(i==1){
-                        gs.setScreen(stp, std::make_shared<MultiplayerMenu>());
-                        return;
-                    }
-                }
-                if(i==0)
-                    text->setString(gs.font, stp.pool, stp.render, u8"Singleplayer");
-                if(i==1)
-                    text->setString(gs.font, stp.pool, stp.render, u8"Multiplayer");
-            }else{
-                if(i==0)
-                    text->setString(gs.font, stp.pool, stp.render, u8"Suffer alone    😈");
-                if(i==1)
-                    text->setString(gs.font, stp.pool, stp.render, u8"Suffer together 😈 😈");
-
-            }
-
-
-
-            gs.pushConstantText.use(stp.buffer,gs.pipelineText,GuiSystem::PushConstantBlockText(screenSize,position,size,gs.font.texturePacker.getSize(),color));
-
-            text->draw(stp.buffer);
-            i++;
-            if(i==2){
-                if(std::chrono::steady_clock::now() > start+std::chrono::milliseconds(400))
-                    break;
-            }
-        }
-    } 
-    MainMenu::~MainMenu(){
-
-    }
 void GuiSystem::create(Setup& stp){
 
     
@@ -320,7 +227,7 @@ void GuiSystem::create(Setup& stp){
         pipelineText.create(stp.render,stp.device,stp.projectBaseDir/"bin"/"shaders"/"text.spv",
             "vertMain","fragMain",stp.swapchain,dsLayout,stp.depthBuffer,false,&pushConstantText
         );
-        setScreen(stp,std::make_shared<MainMenu>());
+        setScreen(stp,nullptr);
     }
 void GuiSystem::draw(Setup& stp){
         stp.buffer.commandBuffer.setViewport(0, vk::Viewport{
