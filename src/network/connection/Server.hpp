@@ -1,24 +1,14 @@
 #pragma once
-#include <atomic>
 #include <cstddef>
-#include <functional>
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <stop_token>
 #include <thread>
 #include <vector>
-#include "data/BinaryData.hpp"
-#include "network/Channel.hpp"
 #include "network/basic/TcpSocket.hpp"
-#include "server/Player.hpp"
+#include "network/connection/ProtocolList.hpp"
+#include "network/connection/Connection.hpp"
 
-struct Connection{
-    Channel4TwoThread toServer;
-    Channel4TwoThread toClient;
-
-    std::atomic_bool isClose = false;
-};
 
 struct Player{
     std::shared_ptr<Connection> con;
@@ -40,6 +30,7 @@ class Server{
     std::vector<Player> players;
     std::mutex mutex;
 public:
+    ProtocolList procotolList;
 
     void listen(std::size_t port);   
     void addPlayer(std::shared_ptr<Connection> con);    

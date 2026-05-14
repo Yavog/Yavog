@@ -1,4 +1,4 @@
-#include "network/Channel.hpp"
+#include "network/connection/Channel.hpp"
 #include "data/BinaryData.hpp"
 #include <atomic>
 #include <cstdint>

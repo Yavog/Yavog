@@ -3,6 +3,9 @@
 #include <filesystem>
 #include <iostream>
 #include "App.hpp"
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 
 int experimentServer();
 int experimentParser();
@@ -10,7 +13,10 @@ int experimentParser();
 int main(int argc, char const *argv[]){    
     setlocale(LC_ALL, "en_US.utf8");
     
-    return experimentServer();
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+    // return experimentServer();
     // return experimentParser();
     
     time_t t;

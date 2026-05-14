@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <ctime>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -45,10 +46,8 @@ void Server::run(std::stop_token stoken,size_t port){
                 listener.accept(con.client,  ipAddr, port);
                 poll.add(con.client,false,true);
                 
-                std::lock_guard lock(mutex);
-                players.push_back({
-                    con.con
-                });
+                addPlayer(con.con);
+
             }
             for(size_t i = 0;i<connections.size();){
                 auto& con = connections[i];
@@ -111,6 +110,7 @@ void Server::run(std::stop_token stoken,size_t port){
 void Server::listen(size_t port){
     networkThread = std::jthread(&Server::run,this, port);
 }
+time_t lastTime = 0;
 void Server::update(){
     std::lock_guard lock(mutex);
     for (size_t i = 0; i < players.size();) {
@@ -126,20 +126,26 @@ void Server::update(){
         if(auto _bd = player.con->toServer.recv(); _bd.has_value())
         {
             auto bd = _bd.value();
-            int8_t t;
-
-            while(bd.readI8(t)){
-                std::cout << t << std::endl;
-            }
             player.con->toClient.send(bd);
         }
         i++;
     }
+    time_t t;
+    time(&t);
+    if(t>lastTime && players.size()){
+        procotolList.debugPrint.send(players[0].con->toClient, std::to_string(t));
+        lastTime = t;
+    }
+    
 }
 void Server::addPlayer(std::shared_ptr<Connection> con){
     std::lock_guard lock(mutex);
     Player player;
     player.con = con;
     players.push_back(player);
+    con->toClient.send(procotolList);
+    
+
+    procotolList.debugPrint.send(con->toClient, "Welcome!");
 }    
 
