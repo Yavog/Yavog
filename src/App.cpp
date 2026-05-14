@@ -42,6 +42,7 @@ bool App::run(){
         
         glfwPollEvents();
 
+        fpsCounter.update();
         guiSystem->draw(CB);
 
         vulkan.swapchain.endRendering(CB, imageIndex);

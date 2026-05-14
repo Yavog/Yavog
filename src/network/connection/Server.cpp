@@ -15,12 +15,8 @@
 #include <thread>
 #include <vector>
 
-void Server::run(std::stop_token stoken,size_t port){
-    TcpListener listener;
+void Server::run(std::stop_token stoken,TcpListener listener){
     SocketPoll poll;
-    
-    auto portStr = std::to_string(port);
-    listener.listen(std::u8string(portStr.begin(),portStr.end()));
     poll.add(listener);
         
     const size_t BUFFER_SIZE = 2048;
@@ -107,8 +103,15 @@ void Server::run(std::stop_token stoken,size_t port){
     listener.close();
 }
 
-void Server::listen(size_t port){
-    networkThread = std::jthread(&Server::run,this, port);
+bool Server::listen(size_t port){
+    TcpListener listener;
+
+    auto portStr = std::to_string(port);
+    if(!listener.listen(std::u8string(portStr.begin(),portStr.end())))
+        return false;
+    
+    networkThread = std::jthread(&Server::run,this, std::move(listener));
+    return true;
 }
 time_t lastTime = 0;
 void Server::update(){

@@ -118,20 +118,6 @@ Server server;
 ClientNetworkConnection client;
 
 
-
-class MultiplayerLobby:public Screen{
-public:
-    void create(GuiSystem& gs,Setup& stp)override{
-
-    }
-    void draw(GuiSystem& gs,Setup& stp,glm::vec2 relativeMousePosition)override{
-
-    }
-    ~MultiplayerLobby(){
-
-    }
-};
-
 class MultiplayerMenu:public Screen{
     Text ipAddressLabel;
     Text nameLabel;
@@ -179,7 +165,7 @@ class MultiplayerMenu:public Screen{
                     }else if(i==2){
                         if(client.join(ipAddressLabel.string)){
                             //client.sendUsername(toUTF8(nameLabel.string));
-                            gs.setScreen(stp, std::make_shared<class MultiplayerLobby>());
+                            gs.setScreen(stp, nullptr);
                             return;
                         }
                     }else if(i==3){
