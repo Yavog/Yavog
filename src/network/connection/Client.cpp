@@ -37,17 +37,17 @@ bool ClientNetworkConnection::join(std::u32string u32address){
     poll.add(socket,false,true);
     return true;
 }
-void ClientNetworkConnection::update(){
+bool ClientNetworkConnection::update(){
     if(!socket.exist()){
         con->isClose = true;
-        return;
+        return false;
     }
     //send 
     if(!con->toServer.isEmpty()){
         poll.addWrite(socket);
     }
     
-    if(poll.wait()){
+    if(poll.wait(0)){
         //send
         if(poll.isWriteable(socket)){
             if(!sending.size()){
@@ -91,4 +91,5 @@ void ClientNetworkConnection::update(){
             }
         }
     }
+    return true;
 }

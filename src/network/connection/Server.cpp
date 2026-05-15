@@ -104,6 +104,11 @@ void Server::run(std::stop_token stoken,TcpListener listener){
 }
 
 bool Server::listen(size_t port){
+    if(networkThread.joinable()){
+        networkThread.request_stop();
+        networkThread.join();
+    }
+
     TcpListener listener;
 
     auto portStr = std::to_string(port);
@@ -126,12 +131,19 @@ void Server::update(){
             players.pop_back();
             continue;
         }
+        i++;
+    }
+
+
+    // TMP:
+    for (size_t i = 0; i < players.size();i++) {
+        auto& player = players[i];
+
         if(auto _bd = player.con->toServer.recv(); _bd.has_value())
         {
             auto bd = _bd.value();
             player.con->toClient.send(bd);
         }
-        i++;
     }
     time_t t;
     time(&t);

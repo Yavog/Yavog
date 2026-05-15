@@ -1,4 +1,5 @@
 #include "MultiplayerJoinMenu.hpp"
+#include "App.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "gui/screen/MainMenu.hpp"
 #include "gui/screen/MultiplayerMenu.hpp"
@@ -92,9 +93,10 @@ bool MultiplayerJoinMenu::receive(const Event& event){
                     return true;
                 }
 
+                Client& client = App::app->client;
 
-                ClientNetworkConnection cnc;
-                if(!cnc.join(serverIp.text.string)){
+                
+                if(!client.join(serverIp.text.string)){
                     join.setString(u8"couldn't connect. retry...");
                     join.text.string.clear();
                     serverIp.color = colorInvalid;

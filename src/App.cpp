@@ -1,3 +1,4 @@
+#include <cassert>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -8,7 +9,15 @@
 #include "gui/GuiScreen.hpp"
 #include "vulkan/window/DepthBuffer.hpp"
 
+App* App::app = nullptr;
+
 App::App(std::filesystem::path projectDir):projectDir(projectDir){
+    assert(!app);
+    app = this;
+}
+App::~App(){
+    assert(app);
+    app = nullptr;
 }
 
 
@@ -44,6 +53,8 @@ bool App::run(){
 
         fpsCounter.update();
         guiSystem->draw(CB);
+        client.update();
+        server.update();
 
         vulkan.swapchain.endRendering(CB, imageIndex);
         CB.end();

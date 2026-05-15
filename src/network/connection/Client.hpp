@@ -23,5 +23,37 @@ struct ClientNetworkConnection{
                 
     static std::u8string toUTF8(std::u32string u32address);
     bool join(std::u32string u32address);
-    void update();
+    [[nodiscard]]bool update();
+};
+
+struct Client{
+    ClientNetworkConnection cnc;
+    ProtocolList pl;
+    bool firstPackage;
+
+    bool join(std::u32string u32address){
+        if(!cnc.join(u32address))
+            return false;
+        firstPackage = true;
+        return true;
+    }
+    // return: success?
+    [[nodiscard]]bool update(){
+        if(!cnc.update())
+            return false;
+
+        if(auto _bd = cnc.con->toClient.recv();_bd.has_value()){
+            auto bd = _bd.value();
+            
+            if(firstPackage){
+                if(!pl.createClient(bd)){
+                    return false;
+                }
+            }else{
+                pl.receive(*cnc.con, bd, true);
+            }
+            firstPackage = false;
+        }
+        return true;
+    }
 };

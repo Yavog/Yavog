@@ -1,4 +1,5 @@
 #include "MultiplayerHostMenu.hpp"
+#include "App.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "gui/screen/MainMenu.hpp"
 #include "gui/screen/MultiplayerMenu.hpp"
@@ -103,7 +104,8 @@ bool MultiplayerHostMenu::receive(const Event& event){
                     port.color = colorInvalid;
                     return true;
                 }
-                Server server;
+
+                Server& server = App::app->server;
                 if(!server.listen(portNumber)){
                     port.setString(u8"couldn't use this port.");
                     port.text.string.clear();
