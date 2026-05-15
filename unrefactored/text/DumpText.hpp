@@ -15,7 +15,7 @@
 #include <vector>
 #include FT_FREETYPE_H  
 #include "vulkan/setup/CommandPool.hpp"
-#include "Text/TexturePacker.hpp"
+#include "text/TexturePacker.hpp"
 
 /*
     Can only represent non-CTL characters. 

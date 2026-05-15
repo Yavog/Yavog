@@ -1,8 +1,8 @@
 
-#include "Parser/Source.hpp"
-#include "Parser/SourceCollection.hpp"
-#include "Parser/Token.hpp"
-#include "Parser/TokenIterator.hpp"
+#include "parser/Source.hpp"
+#include "parser/SourceCollection.hpp"
+#include "parser/Token.hpp"
+#include "parser/TokenIterator.hpp"
 #include "data/Filebasic.hpp"
 #include <fstream>
 #include <iostream>

@@ -1,5 +1,5 @@
 #include "TokenIterator.hpp"
-#include "Parser/Token.hpp"
+#include "parser/Token.hpp"
 
 TokenIterator::TokenIterator(SourceCollection& collection,Token* parent,size_t index):collection(collection),parent(parent),index(index){
 }

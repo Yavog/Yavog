@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include "Parser/Source.hpp"
+#include "parser/Source.hpp"
 
 // I store source files :)
 typedef uint32_t SourceId;

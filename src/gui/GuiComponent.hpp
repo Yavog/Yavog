@@ -1,6 +1,6 @@
 #pragma once
 #include "GLFW/glfw3.h"
-#include "Text/DumpText.hpp"
+#include "text/DumpText.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float4.hpp"
 #include "gui/GuiAsset.hpp"

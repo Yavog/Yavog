@@ -1,6 +1,6 @@
 #include "Token.hpp"
-#include "Parser/Source.hpp"
-#include "Parser/SourceCollection.hpp"
+#include "parser/Source.hpp"
+#include "parser/SourceCollection.hpp"
 #include <fstream>
 #include <algorithm>
 #include <limits>

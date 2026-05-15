@@ -1,5 +1,5 @@
-#include "Parser/SourceCollection.hpp"
-#include "Parser/Source.hpp"
+#include "parser/SourceCollection.hpp"
+#include "parser/Source.hpp"
 #include <cassert>
 #include <memory>
 

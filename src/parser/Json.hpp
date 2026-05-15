@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Parser/Token.hpp"
-#include "Parser/TokenIterator.hpp"
+#include "parser/Token.hpp"
+#include "parser/TokenIterator.hpp"
 #include <cassert>
 #include <ios>
 #include <map>

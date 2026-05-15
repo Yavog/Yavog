@@ -1,5 +1,5 @@
 #include "DumpText.hpp"
-#include "Text/TexturePacker.hpp"
+#include "text/TexturePacker.hpp"
 #include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float4.hpp"
 #include "glm/ext/vector_int2.hpp"

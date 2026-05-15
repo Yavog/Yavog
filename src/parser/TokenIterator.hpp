@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
-#include "Parser/Token.hpp"
+#include "parser/Token.hpp"
 
 class TokenIterator{
     Token* parent = nullptr;

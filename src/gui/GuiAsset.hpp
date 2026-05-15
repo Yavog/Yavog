@@ -1,5 +1,5 @@
 #pragma once
-#include "Text/DumpText.hpp"
+#include "text/DumpText.hpp"
 #include "data/Filebasic.hpp"
 #include "glm/ext/vector_int2.hpp"
 #include "vulkan/Vulkan.hpp"
