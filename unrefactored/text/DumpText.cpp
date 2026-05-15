@@ -6,7 +6,6 @@
 #include "vulkan/setup/CommandBuffer.hpp"
 #include "vulkan/setup/CommandPool.hpp"
 #include "vulkan/window/RenderSync.hpp"
-#include "vulkan/vulkan.hpp"
 #include "vulkan/draw/Buffer.hpp"
 #include "vulkan/draw/Pipeline.hpp"
 #include <cstdint>

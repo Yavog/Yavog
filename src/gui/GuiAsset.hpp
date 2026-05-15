@@ -9,7 +9,6 @@
 #include "vulkan/draw/Pipeline.hpp"
 #include "vulkan/draw/PushContant.hpp"
 #include "vulkan/setup/CommandBuffer.hpp"
-#include "vulkan/vulkan.hpp"
 #include "vulkan_old/Image.hpp"
 #include <cstddef>
 #include <filesystem>

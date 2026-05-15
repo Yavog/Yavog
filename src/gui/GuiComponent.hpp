@@ -8,7 +8,6 @@
 #include "vulkan/Vulkan.hpp"
 #include "vulkan/setup/CommandBuffer.hpp"
 #include "vulkan/setup/CommandPool.hpp"
-#include "vulkan/vulkan.hpp"
 #include <string>
 #include <string_view>
 
