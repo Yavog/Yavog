@@ -28,9 +28,9 @@ class Server{
     void run(std::stop_token stoken,TcpListener listener);
     std::jthread networkThread;
     //this is owned by the update thread
-    std::vector<Player> players;
     std::mutex mutex;
 public:
+    std::vector<Player> players;
     ProtocolList procotolList;
 
     [[nodiscard]] bool listen(std::size_t port);   

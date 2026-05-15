@@ -10,6 +10,27 @@
 
 App* App::app = nullptr;
 
+void generateChunk(Chunk& chunk){
+    time_t t;
+    time(&t);
+    FastNoiseLite noise;
+    noise.SetSeed(t);
+    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+    noise.SetFrequency(0.005);
+    //noise.SetFractalGain(0.75);
+    noise.SetFractalOctaves(5);
+    //noise.SetFractalLacunarity(2);    
+
+    for (int x = 0; x < Chunk::chunkSize; x++) {
+        for (int y = 0; y < Chunk::chunkSize; y++) {
+            for (int z = 0; z < Chunk::chunkSize; z++) {
+                chunk.chunkData[x][y][z].type = noise.GetNoise((float)x, (float)y, (float)z)>0;
+            }
+        }
+    }
+}
+
 App::App(std::filesystem::path projectDir):projectDir(projectDir){
     assert(!app);
     app = this;
@@ -27,13 +48,9 @@ App::App(std::filesystem::path projectDir):projectDir(projectDir){
     //noise.SetFractalLacunarity(2);    
 
     chunk = std::make_shared<Chunk>();
-    for (int x = 0; x < Chunk::chunkSize; x++) {
-        for (int y = 0; y < Chunk::chunkSize; y++) {
-            for (int z = 0; z < Chunk::chunkSize; z++) {
-                chunk->chunkData[x][y][z].type = noise.GetNoise((float)x, (float)y, (float)z)>0;
-            }
-        }
-    }
+    generateChunk(*chunk);
+
+
 }
 App::~App(){
     assert(app);
@@ -80,6 +97,13 @@ bool App::run(){
         client.update();
         server.update();
         
+        if(glfwGetKey(vulkan.window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            generateChunk(*chunk);
+            for(auto& player:server.players)
+                server.procotolList.chunk.send(player.con->toClient, *App::app->chunk);
+        }
+
         //TODO: TMP
         {
             world.draw(vulkan,CB, imageIndex);
