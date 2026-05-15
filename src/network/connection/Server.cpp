@@ -138,11 +138,9 @@ void Server::update(){
     // TMP:
     for (size_t i = 0; i < players.size();i++) {
         auto& player = players[i];
-
-        if(auto _bd = player.con->toServer.recv(); _bd.has_value())
-        {
+        if(auto _bd = player.con->toServer.recv(); _bd.has_value()){
             auto bd = _bd.value();
-            player.con->toClient.send(bd);
+            procotolList.receive(*player.con, bd, false);
         }
     }
     time_t t;

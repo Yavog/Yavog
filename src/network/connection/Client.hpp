@@ -29,13 +29,20 @@ struct ClientNetworkConnection{
 struct Client{
     ClientNetworkConnection cnc;
     ProtocolList pl;
-    bool firstPackage;
 
     bool join(std::u32string u32address){
         if(!cnc.join(u32address))
             return false;
-        firstPackage = true;
-        return true;
+        while(cnc.update()){
+            if(auto _bd = cnc.con->toClient.recv();_bd.has_value()){
+                auto bd = _bd.value();
+                if(!pl.createClient(bd)){
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
     }
     // return: success?
     [[nodiscard]]bool update(){
@@ -45,14 +52,7 @@ struct Client{
         if(auto _bd = cnc.con->toClient.recv();_bd.has_value()){
             auto bd = _bd.value();
             
-            if(firstPackage){
-                if(!pl.createClient(bd)){
-                    return false;
-                }
-            }else{
-                pl.receive(*cnc.con, bd, true);
-            }
-            firstPackage = false;
+            pl.receive(*cnc.con, bd, true);
         }
         return true;
     }

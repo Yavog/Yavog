@@ -112,9 +112,13 @@ bool MultiplayerHostMenu::receive(const Event& event){
                     port.color = colorInvalid;
                     return true;
                 }
-                // while (true) {
-                //     server.update();
-                // }
+                Client& client = App::app->client;
+                auto ip = U"localhost:"+port.text.string;
+                if(!client.join(ip)){
+                    exit(0);
+                }
+                client.pl.debugPrint.send(client.cnc.con->toServer, ClientNetworkConnection::toUTF8(username.text.string));
+
                 gs.setScreen(nullptr);
                 return true;
             }else if(selectedText != hoveredText){

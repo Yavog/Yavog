@@ -6,10 +6,12 @@ struct DebugPrintProtocol:public ProtocolInterface{
     virtual void clientReceive(Channel4TwoThread& con,BinaryData& input){
         std::u8string str;
         input.readString(str);
-        std::cout << "[Debug:Server]"<< str <<std::endl;
+        std::cout << "[Server]"<< str <<std::endl;
     }
     virtual void serverReceive(Channel4TwoThread& con,BinaryData& input){
-
+        std::u8string str;
+        input.readString(str);
+        std::cout << "[Client]"<< str <<std::endl;
     }
 
     void send(Channel4TwoThread& con,std::string msg){

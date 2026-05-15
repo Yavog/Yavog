@@ -102,6 +102,7 @@ bool MultiplayerJoinMenu::receive(const Event& event){
                     serverIp.color = colorInvalid;
                     return true;
                 }
+                client.pl.debugPrint.send(client.cnc.con->toServer, ClientNetworkConnection::toUTF8(username.text.string));
 
                 gs.setScreen(nullptr);
                 return true;
