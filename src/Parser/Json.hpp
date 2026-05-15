@@ -2,9 +2,7 @@
 
 #include "Parser/Token.hpp"
 #include "Parser/TokenIterator.hpp"
-#include <X11/XKBlib.h>
 #include <cassert>
-#include <iomanip>
 #include <ios>
 #include <map>
 #include <sstream>

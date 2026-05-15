@@ -65,13 +65,13 @@ if(WIN32)
   FetchContent_Declare(
     vulkan_headers
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
-    GIT_TAG v1.4.341
+    GIT_TAG vulkan-sdk-1.3.280.0
   )
   FetchContent_MakeAvailable(vulkan_headers)
   FetchContent_Declare(
     vulkan_loader
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader.git
-    GIT_TAG v1.4.341
+    GIT_TAG vulkan-sdk-1.3.280.0
   )
   FetchContent_MakeAvailable(vulkan_loader)
   message("${vulkan_headers_SOURCE_DIR}/include")
