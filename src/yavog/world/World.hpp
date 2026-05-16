@@ -24,7 +24,7 @@ public:
     // Chunk chunk[range][range][range];
 
     void init(Vulkan& vulkan,std::filesystem::path projectBaseDir){
-
+        
         image.create(&vulkan.render,vulkan.commandPool,projectBaseDir/"assets"/"texture.jpg");
         
         camera.create(vulkan.device,&vulkan.render);
@@ -65,18 +65,6 @@ public:
         
         {
             commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *pipeline.graphicsPipeline);
-            commandBuffer.setViewport(0, vk::Viewport{
-                .x = 0.0f,
-                .y = 0.0f,
-                .width = static_cast<float>(vulkan.swapchain.swapChainExtent.width),
-                .height = static_cast<float>(vulkan.swapchain.swapChainExtent.height),
-                .minDepth = 0.0f,
-                .maxDepth = 1.0f,
-            });
-            commandBuffer.setScissor(0, vk::Rect2D{
-                .offset = vk::Offset2D{.x = 0,.y = 0},
-                .extent = vulkan.swapchain.swapChainExtent,
-            });
             
             ds.bind(vulkan.device,commandBuffer,vulkan.render,pipeline);
     

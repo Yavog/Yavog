@@ -57,8 +57,6 @@ App::App(std::filesystem::path projectDir):projectDir(projectDir){
     generateChunk(*chunk);
     
     
-    model = std::make_shared<Model>();
-    model->create( projectDir/"assets"/"model"/"Human.glb");
 
 
 
@@ -78,6 +76,9 @@ bool App::run(){
     world.init(vulkan, projectDir);
     
 
+    model = std::make_shared<Model>();
+    model->create( projectDir/"assets"/"model"/"Human.glb",projectDir,world.camera);
+    
     while (vulkan.window.update()) {
         
         ImageIndex imageIndex;
@@ -130,7 +131,7 @@ bool App::run(){
             if(vulkan.window.isMouseGrabbed())
                 world.camera.update(vulkan.window,fpsCounter.delta);  
             {
-                world.pushConstant.use(CB, world.pipeline, World::WorldPushConstant{.position = position});
+                model->pushConstant.use(CB, model->pipeline, World::WorldPushConstant{.position = position});
                 model->draw(CB);
             }
             //if(!client.cnc.con->isClose)

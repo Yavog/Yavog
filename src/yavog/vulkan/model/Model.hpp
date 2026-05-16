@@ -3,11 +3,14 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <vector>
 #include "cgltf.h"
 #include "glm/ext/vector_float2.hpp"
 #include "yavog/App.hpp"
 #include "yavog/vulkan/draw/Buffer.hpp"
+#include "yavog/vulkan/draw/Descriptor.hpp"
+#include "yavog/vulkan/draw/DescriptorLayout.hpp"
 #include "yavog/vulkan/draw/Pipeline.hpp"
 #include "yavog/vulkan_old/Image.hpp"
 
@@ -17,6 +20,7 @@ class Model{
     std::vector<Vertex> vertices;
     std::vector<uint16_t> indices;
 public:
+    std::shared_ptr<Image> image = std::make_shared<Image>();
     void processNode(cgltf_node& node){
         std::cout << node.name << std::endl;   
         for (int i = 0; i < node.children_count; i++) {
@@ -84,7 +88,7 @@ public:
                         int channels_in_file = 0;
                         auto pxls = stbi_load_from_memory(data, size,&width,&height, &channels_in_file, 4);
                         if(pxls){
-                            
+                            this->image->create(&App::app->vulkan.render, App::app->vulkan.commandPool, width, height, pxls);
                             stbi_image_free(pxls);
                         }
                         std::cout <<mime_type<<std::endl;
@@ -94,8 +98,16 @@ public:
         }
         
     }
+    DescriptorSetLayout dsl;
+    DescriptorSet ds;
+    Pipeline pipeline;
+    PushConstant pushConstant;
 
-    void create(std::filesystem::path fspath){
+    Model(){
+
+    }
+
+    void create(std::filesystem::path fspath,std::filesystem::path projectDir,Camera& camera){
         std::string path = fspath;
         cgltf_options options = {};
         cgltf_data* data = NULL;
@@ -121,8 +133,33 @@ public:
             vertexBuffer.createAndUpload(render,pool,vertices.data(),vertices.size()*sizeof(Vertex),vk::BufferUsageFlagBits::eVertexBuffer);
             indexBuffer.createAndUpload(  render,pool,indices.data(),indices.size() *sizeof(uint16_t),vk::BufferUsageFlagBits::eIndexBuffer);
         }
+
+        // pipeline
+
+        dsl.create(App::app->vulkan.device,{
+            DescriptorLayout(0,vk::ShaderStageFlagBits::eVertex  ,vk::DescriptorType::eUniformBuffer),
+            DescriptorLayout(1,vk::ShaderStageFlagBits::eFragment,vk::DescriptorType::eCombinedImageSampler),
+        });
+        ds.create(App::app->vulkan.device,&App::app->vulkan.render,dsl,{
+            DescriptorLayout(0,vk::ShaderStageFlagBits::eVertex  ,vk::DescriptorType::eUniformBuffer),
+            DescriptorLayout(1,vk::ShaderStageFlagBits::eFragment,vk::DescriptorType::eCombinedImageSampler),
+        });
+        ds.setResource(0, camera.ubo);
+        ds.setResource(1, image);
+
+        pushConstant.create(vk::ShaderStageFlagBits::eVertex, 0, sizeof(World::WorldPushConstant));
+
+        pipeline.create(&App::app->vulkan.render,App::app->vulkan.device,
+            projectDir/"bin"/"shaders"/"model.spv",
+            "vertMain","fragMain",
+            App::app->vulkan.swapchain, dsl,App::app->vulkan.depthBuffer,true,
+            &pushConstant
+        );
     }
     void draw(CommandBuffer& buffer){
+        buffer.commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *pipeline.graphicsPipeline);
+        ds.bind(App::app->vulkan.device,buffer.commandBuffer,App::app->vulkan.render,pipeline);
+
         if(indices.size()){
             auto& commandBuffer = buffer.commandBuffer;
             commandBuffer.bindVertexBuffers(0, *vertexBuffer.buffer, {0});

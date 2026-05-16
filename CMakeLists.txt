@@ -155,22 +155,28 @@ function (add_slang_shader_target TARGET)
 endfunction()
 
 
-file(GLOB_RECURSE SHADER_SLANG_SOURCES CONFIGURE_DEPENDS
-       ${PROJECT_SOURCE_DIR}/shaders/shader.slang)
-file(GLOB_RECURSE SHADER_SLANG_SOURCES_GUI CONFIGURE_DEPENDS
-       ${PROJECT_SOURCE_DIR}/shaders/gui.slang)
-file(GLOB_RECURSE SHADER_SLANG_SOURCES_TEXT CONFIGURE_DEPENDS
-       ${PROJECT_SOURCE_DIR}/shaders/text.slang)
-
 if(WIN32)
   set(SLANGC_EXECUTABLE "${slang_SOURCE_DIR}/bin/slangc.exe")
 else()
   set(SLANGC_EXECUTABLE "${slang_SOURCE_DIR}/bin/slangc")
 endif(WIN32)
 
+
+file(GLOB_RECURSE SHADER_SLANG_SOURCES CONFIGURE_DEPENDS
+       ${PROJECT_SOURCE_DIR}/shaders/shader.slang)
+file(GLOB_RECURSE SHADER_SLANG_SOURCES_GUI CONFIGURE_DEPENDS
+       ${PROJECT_SOURCE_DIR}/shaders/gui.slang)
+file(GLOB_RECURSE SHADER_SLANG_SOURCES_TEXT CONFIGURE_DEPENDS
+       ${PROJECT_SOURCE_DIR}/shaders/text.slang)
+file(GLOB_RECURSE SHADER_SLANG_SOURCES_MODEL CONFIGURE_DEPENDS
+       ${PROJECT_SOURCE_DIR}/shaders/model.slang)
+
+
 add_slang_shader_target( shaders SOURCES ${SHADER_SLANG_SOURCES} OUT slang)
 add_slang_shader_target( shaders_gui SOURCES ${SHADER_SLANG_SOURCES_GUI} OUT gui)
 add_slang_shader_target( shaders_text SOURCES ${SHADER_SLANG_SOURCES_TEXT} OUT text)
+add_slang_shader_target( shaders_model SOURCES ${SHADER_SLANG_SOURCES_MODEL} OUT model)
 add_dependencies(YAVOG shaders)
 add_dependencies(YAVOG shaders_gui)
 add_dependencies(YAVOG shaders_text)
+add_dependencies(YAVOG shaders_model)
