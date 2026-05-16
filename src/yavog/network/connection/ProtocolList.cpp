@@ -1,4 +1,5 @@
 #include "yavog/network/connection/ProtocolList.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <string_view>
@@ -33,17 +34,12 @@ ProtocolList::operator BinaryData(){
     }
     return true;
 }
-bool ProtocolList::receive(Connection& con,BinaryData& input, bool clientSide){
+ProtocolInterface* ProtocolList::getProtocolInterface(BinaryData& input){
     uint16_t protocolId;
     input.readU16(protocolId);
 
     if(sorted.size() <= protocolId){
-        return false;
+        return nullptr;
     }
-    if(clientSide){
-        sorted[protocolId]->clientReceive(con.toServer,input);
-    }else{
-        sorted[protocolId]->serverReceive(con.toClient,input);
-    }
-    return true;
+    return sorted[protocolId];
 }

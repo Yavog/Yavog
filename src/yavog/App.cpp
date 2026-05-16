@@ -9,8 +9,12 @@
 #include <GLFW/glfw3.h>
 #include <ratio>
 #include <thread>
+#include "glm/ext/vector_float3.hpp"
 #include "yavog/gui/screen/MainMenu.hpp"
+#include "yavog/vulkan/draw/PushContant.hpp"
 #include "yavog/world/Chunk.hpp"
+#include "yavog/vulkan/model/Model.hpp"
+#include "yavog/world/World.hpp"
 
 App* App::app = nullptr;
 
@@ -51,6 +55,11 @@ App::App(std::filesystem::path projectDir):projectDir(projectDir){
 
     chunk = std::make_shared<Chunk>();
     generateChunk(*chunk);
+    
+    
+    model = std::make_shared<Model>();
+    model->create( projectDir/"assets"/"model"/"Human.glb");
+
 
 
 }
@@ -94,7 +103,6 @@ bool App::run(){
         glfwPollEvents();
 
         fpsCounter.update();
-        guiSystem->draw(CB);
 
         if( !client.update() && !guiSystem->screen ){
             guiSystem->setScreen(std::make_shared<MainMenu>(*guiSystem));
@@ -112,13 +120,25 @@ bool App::run(){
         //TODO: TMP
         {
             world.draw(vulkan,CB, imageIndex);
-            if(chunk)
+            if(chunk){
+                
+                world.pushConstant.use(CB, world.pipeline, World::WorldPushConstant{.position = glm::vec3(0)});
                 chunk->draw(CB);
+            }
 
             //camera 
             if(vulkan.window.isMouseGrabbed())
                 world.camera.update(vulkan.window,fpsCounter.delta);  
+            {
+                world.pushConstant.use(CB, world.pipeline, World::WorldPushConstant{.position = position});
+                model->draw(CB);
+            }
+            //if(!client.cnc.con->isClose)
+            client.pl.playerMovement.send(client.cnc.con->toServer, world.camera);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+        guiSystem->draw(CB);
+
 
         vulkan.swapchain.endRendering(CB, imageIndex);
         CB.end();

@@ -7,3 +7,6 @@ struct Connection{
 
     std::atomic_bool isClose = false;
 };
+struct Player{
+    std::shared_ptr<Connection> con;
+};

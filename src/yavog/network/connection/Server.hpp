@@ -11,9 +11,7 @@
 #include "yavog/network/connection/Connection.hpp"
 
 
-struct Player{
-    std::shared_ptr<Connection> con;
-};
+
 
 class Server{
     //all of this  is owned by the network thread

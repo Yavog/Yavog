@@ -8,7 +8,7 @@ struct DebugPrintProtocol:public ProtocolInterface{
         input.readString(str);
         std::cout << "[Server]"<< str <<std::endl;
     }
-    virtual void serverReceive(Channel4TwoThread& con,BinaryData& input)override{
+    virtual void serverReceive(Player& player,BinaryData& input)override{
         std::u8string str;
         input.readString(str);
         std::cout << "[Client]"<< str <<std::endl;

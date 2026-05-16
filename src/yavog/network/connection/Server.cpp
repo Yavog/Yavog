@@ -138,9 +138,13 @@ void Server::update(){
 
     for (size_t i = 0; i < players.size();i++) {
         auto& player = players[i];
-        if(auto _bd = player.con->toServer.recv(); _bd.has_value()){
-            auto bd = _bd.value();
-            procotolList.receive(*player.con, bd, false);
+        while(true){
+            if(auto _bd = player.con->toServer.recv(); _bd.has_value()){
+                auto bd = _bd.value();
+                if(auto pi = procotolList.getProtocolInterface(bd)){
+                    pi->serverReceive(player, bd);
+                }
+            }else break;
         }
     }
     

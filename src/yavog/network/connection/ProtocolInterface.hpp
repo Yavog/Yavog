@@ -6,8 +6,8 @@
 
 struct ProtocolInterface{
     uint16_t protocolId = -1;
-    virtual void clientReceive(class Channel4TwoThread& con,BinaryData& input)=0;
-    virtual void serverReceive(class Channel4TwoThread& con,BinaryData& input)=0;
+    virtual void clientReceive(class Channel4TwoThread& responseChannel,BinaryData& input)=0;
+    virtual void serverReceive(class Player& player,BinaryData& input)=0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const std::u8string& str) {

@@ -31,7 +31,7 @@ void client(std::stop_token token){
                     return;
                 }
             }else{
-                pl.receive(*cnc.con, bd, true);
+                pl.getProtocolInterface(bd)->clientReceive(cnc.con->toServer, bd);
             }
             firstPackage = false;
         }

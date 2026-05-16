@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <memory>
+#include "glm/ext/vector_float3.hpp"
 #include "yavog/client/FPSMessurement.hpp"
 #include "yavog/gui/GuiComponent.hpp"
 #include "yavog/gui/GuiScreen.hpp"
@@ -23,6 +24,8 @@ public:
     ///@return restart?
     bool run();
 
+    std::shared_ptr<class Model> model;
+    glm::vec3 position = glm::vec3(0);
 
     Server server;
     Client client;

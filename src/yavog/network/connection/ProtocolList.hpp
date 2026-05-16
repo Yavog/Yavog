@@ -8,15 +8,18 @@
 #include "yavog/network/connection/ProtocolInterface.hpp"
 #include "yavog/network/connection/protocol/DebugPrintProtocol.hpp"
 #include "yavog/network/connection/protocol/ChunkProtocol.hpp"
+#include "yavog/network/connection/protocol/PlayerMovementProtocol.hpp"
 
 class ProtocolList{
 public:
-    DebugPrintProtocol debugPrint;
-    ChunkProtocol      chunk;
+    DebugPrintProtocol     debugPrint;
+    ChunkProtocol          chunk;
+    PlayerMovementProtocol playerMovement;
 private:
     std::map<std::u8string, ProtocolInterface*> mapping = {
         {u8"debugPrint.0",&debugPrint},
-        {u8"chunk.0",&chunk}
+        {u8"chunk.0",&chunk},
+        {u8"playerMovement.0",&playerMovement}
     };
     std::map<ProtocolInterface*,std::u8string> reverseMapping;
 
@@ -33,5 +36,5 @@ public:
     operator BinaryData();
     [[nodiscard]] bool createClient(BinaryData& protocolPalette);
 
-    bool receive(class Connection& con,BinaryData& input, bool clientSide);
+    ProtocolInterface* getProtocolInterface(BinaryData& input);
 };

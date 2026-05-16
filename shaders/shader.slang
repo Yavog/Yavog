@@ -18,11 +18,15 @@ struct VertexOutput {
     float2 fragTexCoord;
     float3 pos;
 };
+struct PushConstants {
+    float3 offset;
+};
+[[vk::push_constant]] PushConstants pc;
 
 [shader("vertex")]
 VertexOutput vertMain(VSInput input,uint vid : SV_VertexID,uint iid :SV_InstanceID) {
     VertexOutput output;
-    output.sv_position = mul(ubo.proj, mul(ubo.view, mul(ubo.model, float4(input.inPosition , 1.0))));
+    output.sv_position = mul(ubo.proj, mul(ubo.view, mul(ubo.model, float4(input.inPosition + pc.offset , 1.0))));
     output.color = input.inColor;
     output.fragTexCoord = input.inTexCoord;
     output.pos = input.inPosition;

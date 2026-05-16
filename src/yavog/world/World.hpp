@@ -1,9 +1,11 @@
 #pragma once
 
+#include "glm/ext/vector_float3.hpp"
 #include "yavog/client/Camera.hpp"
 #include "yavog/vulkan/Vulkan.hpp"
 #include "yavog/vulkan/draw/DescriptorLayout.hpp"
 #include "yavog/vulkan/draw/Pipeline.hpp"
+#include "yavog/vulkan/draw/PushContant.hpp"
 #include "yavog/vulkan_old/Image.hpp"
 
 class World{
@@ -13,7 +15,11 @@ public:
     DescriptorSet ds;
     Camera camera;
     Pipeline pipeline;
-    
+    PushConstant pushConstant;
+
+    struct WorldPushConstant{
+        glm::vec3 position;
+    };
     // static const size_t range = 3;
     // Chunk chunk[range][range][range];
 
@@ -32,11 +38,13 @@ public:
         });
         ds.setResource(0, camera.ubo);
 
-        ;
+        pushConstant.create(vk::ShaderStageFlagBits::eVertex, 0, sizeof(WorldPushConstant));
         pipeline.create(&vulkan.render,vulkan.device,
             projectBaseDir/"bin"/"shaders"/"slang.spv",
             "vertMain","fragMain",
-            vulkan.swapchain, dsLayout,vulkan.depthBuffer);
+            vulkan.swapchain, dsLayout,vulkan.depthBuffer,true,
+            &pushConstant
+        );
 
         // for (size_t x = 0; x < range; x++){
         //     for (size_t y = 0; y < range; y++){

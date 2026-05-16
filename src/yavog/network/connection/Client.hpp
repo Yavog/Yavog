@@ -48,11 +48,14 @@ struct Client{
     [[nodiscard]]bool update(){
         if(!cnc.update())
             return false;
-
-        if(auto _bd = cnc.con->toClient.recv();_bd.has_value()){
-            auto bd = _bd.value();
-            
-            pl.receive(*cnc.con, bd, true);
+        while(true){
+            if(auto _bd = cnc.con->toClient.recv();_bd.has_value()){
+                auto bd = _bd.value();
+                if(auto pi = pl.getProtocolInterface(bd)){
+                    pi->clientReceive(cnc.con->toServer, bd);
+                }
+            }else 
+               break;
         }
         return true;
     }
