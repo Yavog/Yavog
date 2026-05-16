@@ -3,17 +3,28 @@
 #include <filesystem>
 #include <iostream>
 #include "yavog/App.hpp"
+#include "yavog/vulkan/model/Model.hpp"
 #ifdef _WIN32
     #include <windows.h>
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define CGLTF_IMPLEMENTATION
+#include "cgltf.h"
+
 
 int experimentServer();
 int experimentParser();
 
-int main(int argc, char const *argv[]){    
+
+void test(std::filesystem::path projectDir){
+    Model model;
+    model.create( projectDir/"assets"/"model"/"Human.glb");
+    exit(0);
+}
+
+int main(int argc, char const *argv[]){        
     setlocale(LC_ALL, "en_US.utf8");
     
 #ifdef _WIN32
@@ -27,6 +38,8 @@ int main(int argc, char const *argv[]){
     srand(t);
     
     auto projectBaseDir = std::filesystem::canonical(argv[0]).parent_path().parent_path().parent_path();
+    test(projectBaseDir);
+
     try{
         while(true){
             App app(projectBaseDir);

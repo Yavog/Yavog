@@ -60,7 +60,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
   GIT_TAG        b1f47850878d232eea372ab167e760ccac4c4e32 #version
 )
-FetchContent_MakeAvailable(glfw glm stb fastnoiselite freetype)
+FetchContent_Declare(
+  cgltf
+  GIT_REPOSITORY https://github.com/jkuhlmann/cgltf.git
+  GIT_TAG        v1.15
+)
+
+FetchContent_MakeAvailable(glfw glm stb fastnoiselite freetype cgltf)
 
 #vulkan
 FetchContent_Declare(
@@ -111,9 +117,8 @@ if(MSVC)
   target_compile_options(YAVOG PRIVATE /wd2397 /wd4838)
 endif()
 
-target_include_directories(YAVOG PRIVATE
-    ${stb_SOURCE_DIR}
-)
+target_include_directories(YAVOG PRIVATE ${stb_SOURCE_DIR})
+target_include_directories(YAVOG PRIVATE ${cgltf_SOURCE_DIR})
 target_include_directories(YAVOG PRIVATE
   ${fastnoiselite_SOURCE_DIR}/Cpp
 )
