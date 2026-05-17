@@ -112,7 +112,7 @@ public:
     }
 
     void create(std::filesystem::path fspath,std::filesystem::path projectDir,Camera& camera){
-        std::string path = fspath;
+        std::string path = fspath.string();
         cgltf_options options = {};
         cgltf_data* data = NULL;
 
