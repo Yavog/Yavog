@@ -9,10 +9,10 @@ void EntityProtocol::clientReceive(Channel4TwoThread& con,BinaryData& input){
     input.readU32(id);
 
     if(type == CommandType::ADD){
-        App::app->entityPositions.insert(id);
+        App::app->entityMovement.insert(id);
     }
     else if(type == CommandType::REMOVE){
-        App::app->entityPositions.erase(id);
+        App::app->entityMovement.erase(id);
     }
 }
 void EntityProtocol::serverReceive(Player& player,BinaryData& input){

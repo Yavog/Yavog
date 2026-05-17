@@ -135,11 +135,11 @@ bool App::run(){
             if(vulkan.window.isMouseGrabbed())
                 world.camera.update(vulkan.window,fpsCounter.delta);  
             
-            for(auto& position:entityPositions)
+            for(auto& movement:entityMovement)
             {
                 glm::mat4 matrix(1);
-                matrix = glm::translate(matrix, position-glm::vec3(0,2,0));
-                matrix = glm::rotate(matrix, (float)(phi+std::numbers::pi) , glm::vec3(0.0f, 1.0f, 0.0f));
+                matrix = glm::translate(matrix, movement.position-glm::vec3(0,2,0));
+                matrix = glm::rotate(matrix, (float)(movement.phi+std::numbers::pi) , glm::vec3(0.0f, 1.0f, 0.0f));
                 model->pushConstant.use(CB, model->pipeline, Model::ModelPushConstant{
                     .matrix = matrix
                 });

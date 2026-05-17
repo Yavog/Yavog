@@ -31,10 +31,14 @@ public:
 
     //TMP
     std::shared_ptr<class Model> model;
-    float phi;
-    float theta;   
+    struct Movement{
+        glm::vec3 position;
+        float phi;
+        float theta;   
+    };
     EntityManagerServer  entityManagerServer;
-    SparseSet<glm::vec3> entityPositions; 
+    
+    SparseSet<Movement> entityMovement; 
 
 
     

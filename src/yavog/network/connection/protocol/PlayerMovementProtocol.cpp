@@ -23,12 +23,12 @@ void PlayerMovementProtocol::clientReceive(Channel4TwoThread& con,BinaryData& in
         //     std::cout << position[i]<<" ";
         // }
         // std::cout << std::endl;
-        if(auto _comp = App::app->entityPositions.get(entity);_comp.has_value()){
+        if(auto _comp = App::app->entityMovement.get(entity);_comp.has_value()){
             auto comp = _comp.value();
-            *comp = position;
+            comp->position = position;
+            comp->phi = phi;
+            comp->theta = theta;
         }
-        App::app->phi = phi;
-        App::app->theta = theta;
         
     }
 }
