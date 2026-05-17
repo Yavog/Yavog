@@ -6,7 +6,7 @@ Vulkan::Vulkan():
     swapchain(deviceSettings){
     
     instance.create(instanceSettings);
-    window.create(instance,1280, 720, "YAVoG");
+    window.create(instance,640, 360, "YAVoG");
     queue.create(window,deviceSettings);
 
     // Create a chain of feature structures
