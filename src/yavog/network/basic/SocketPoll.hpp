@@ -35,4 +35,5 @@ public:
     
     bool isWriteable(SocketBase& socket);
     bool isReadable (SocketBase& socket);
+    bool isClosed   (SocketBase& socket);
 };

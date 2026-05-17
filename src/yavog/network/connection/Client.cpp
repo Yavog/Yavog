@@ -50,6 +50,13 @@ bool ClientNetworkConnection::update(){
     bool repeat = true;
     while(poll.wait(0) && repeat){
         repeat = false;
+        // close
+        if(poll.isClosed(socket)){
+            if(socket.exist())
+                socket.close();
+            con->isClose = true;
+            return false;
+        }
         //send
         if(poll.isWriteable(socket)){
             if(!sending.size()){

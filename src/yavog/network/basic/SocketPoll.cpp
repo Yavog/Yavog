@@ -72,6 +72,17 @@ void SocketPoll::removeWrite(SocketBase& socket){
     
 
 bool SocketPoll::wait(size_t ms){
+    //remove all invalid sockets:
+    for (size_t i = 0; i < connections.size();){
+        auto& con = connections[i];
+        if(con.revents & (POLLERR|POLLHUP|POLLNVAL)){
+            remove(con.fd);
+        }
+        else {
+            i++;
+        }
+    }
+
     //reset everything
     for (auto &&con : connections){
         con.revents = 0;
@@ -91,17 +102,6 @@ bool SocketPoll::wait(size_t ms){
     //WSAPoll requires at least one element in fds[first arg]
     int v = WSAPoll(connections.data(),connections.size(),ms);
 #endif
-    //remove all invalid sockets:
-    
-    for (size_t i = 0; i < connections.size();){
-        auto& con = connections[i];
-        if(con.revents & (POLLERR|POLLHUP|POLLNVAL)){
-            remove(con.fd);
-        }
-        else {
-            i++;
-        }
-    }
     
     if(v<0){
         perror("poll");
@@ -121,4 +121,12 @@ bool SocketPoll::isReadable (SocketBase& socket){
         return false;
     int index = handle2Index[handle];
     return connections[index].revents & POLLRDNORM;
+}
+bool SocketPoll::isClosed   (SocketBase& socket){
+    int handle = socket.getHandle();
+    if(handle2Index.find(handle)==handle2Index.end())
+        return true;
+    int index = handle2Index[handle];
+    return connections[index].revents & (POLLERR|POLLHUP|POLLNVAL);
+
 }

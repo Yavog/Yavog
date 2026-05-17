@@ -48,6 +48,17 @@ void Server::run(std::stop_token stoken,TcpListener listener){
             }
             for(size_t i = 0;i<connections.size();){
                 auto& con = connections[i];
+                // closed
+                if(poll.isClosed(con.client)){
+                    if(con.client.exist()){
+                        con.client.close();
+                    }
+                    con.con->isClose = true;
+                    // swap remove
+                    std::swap(connections[i], connections[connections.size()-1]);
+                    connections.pop_back();
+                    continue;
+                }
                 //send
                 if(poll.isWriteable(con.client)){
                     if(con.sending.size() == 0){
@@ -87,14 +98,6 @@ void Server::run(std::stop_token stoken,TcpListener listener){
                             }else break;
                         }
                         con.receiving.erase(con.receiving.begin(), con.receiving.begin()+index);
-                    }
-                    if(!con.client.exist()){
-                        poll.remove(con.client);
-                        con.con->isClose = true;
-                        // swap remove
-                        std::swap(connections[i], connections[connections.size()-1]);
-                        connections.pop_back();
-                        continue;
                     }
                 }
                 i++; 
