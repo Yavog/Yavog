@@ -112,17 +112,31 @@ public:
         void createTextureSampler(Device& device) {
             vk::PhysicalDeviceProperties properties = device.physicalDevice.getProperties();
             vk::SamplerCreateInfo samplerInfo{
-                .magFilter = vk::Filter::eLinear, 
-                .minFilter = vk::Filter::eLinear,  
-                .mipmapMode = vk::SamplerMipmapMode::eLinear,
-                .addressModeU = vk::SamplerAddressMode::eRepeat,
-                .addressModeV = vk::SamplerAddressMode::eRepeat,
-                .addressModeW = vk::SamplerAddressMode::eRepeat,
-                .anisotropyEnable = vk::True, // TODO: deactive when .samplerAnisotropy isnt available and make maxAnisotropy = 1.0f
-                .maxAnisotropy = properties.limits.maxSamplerAnisotropy, 
+                .magFilter = vk::Filter::eNearest, 
+                .minFilter = vk::Filter::eNearest,  
+                .mipmapMode = vk::SamplerMipmapMode::eNearest,
+                .addressModeU = vk::SamplerAddressMode::eClampToEdge,
+                .addressModeV = vk::SamplerAddressMode::eClampToEdge,
+                .addressModeW = vk::SamplerAddressMode::eClampToEdge,
+                .anisotropyEnable = vk::False, 
+                .maxAnisotropy = 1.0f, 
                 .compareEnable = vk::False,
-                .compareOp = vk::CompareOp::eAlways
+                .compareOp = vk::CompareOp::eAlways,
+                .minLod = 0,
+                .maxLod = 0,
             };
+            //  vk::SamplerCreateInfo samplerInfo{
+            //     .magFilter = vk::Filter::eLinear, 
+            //     .minFilter = vk::Filter::eLinear,  
+            //     .mipmapMode = vk::SamplerMipmapMode::eLinear,
+            //     .addressModeU = vk::SamplerAddressMode::eRepeat,
+            //     .addressModeV = vk::SamplerAddressMode::eRepeat,
+            //     .addressModeW = vk::SamplerAddressMode::eRepeat,
+            //     .anisotropyEnable = vk::True, // TODO: deactive when .samplerAnisotropy isnt available and make maxAnisotropy = 1.0f
+            //     .maxAnisotropy = properties.limits.maxSamplerAnisotropy, 
+            //     .compareEnable = vk::False,
+            //     .compareOp = vk::CompareOp::eAlways
+            // };
             textureSampler = vk::raii::Sampler(device.device, samplerInfo);
         }
 
