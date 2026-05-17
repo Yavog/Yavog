@@ -110,6 +110,8 @@ bool App::run(){
         if( !client.update() && !guiSystem->screen ){
             guiSystem->setScreen(std::make_shared<MainMenu>(*guiSystem));
             chunk.reset();
+            chunk = std::make_shared<Chunk>();
+            generateChunk(*chunk);
         }
         server.update();
         

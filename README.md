@@ -8,3 +8,5 @@ There is no set goal, and i also dont want a goal.
 Everything will be spontaneously decided.
 
 This Project is 100% made by Humans.
+
+Make sure to have at least 5GB of memory before installing.
