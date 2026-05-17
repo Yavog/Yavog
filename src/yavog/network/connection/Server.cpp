@@ -131,6 +131,7 @@ void Server::update(){
         if(player.con->isClose){
             // swapremove
             std::cout << "player disconnected!"<<std::endl;
+            removePlayer(player);
             std::swap(players[i], players[players.size()-1]);
             players.pop_back();
             continue;
@@ -161,6 +162,19 @@ void Server::addPlayer(std::shared_ptr<Connection> con){
     
 
     procotolList.debugPrint.send(con->toClient, "Welcome!");
+    auto playerEntity = App::app->entityManagerServer.addEntity();
+    players.back().entity = playerEntity;
+    for(auto& player:players)
+        procotolList.entity.add(con->toClient, player.entity);
+    for(auto& player:players)
+        procotolList.entity.add(player.con->toClient, playerEntity);
     procotolList.chunk.send(con->toClient, *App::app->chunk);
 }    
 
+void Server::removePlayer(Player& player){
+    player.con->isClose = true;
+
+    App::app->entityManagerServer.removeEntity(player.entity);
+    for(auto& otherPlayer:players)
+        procotolList.entity.remove(otherPlayer.con->toClient, player.entity);
+}

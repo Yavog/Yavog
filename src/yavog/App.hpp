@@ -3,6 +3,8 @@
 #include <memory>
 #include "glm/ext/vector_float3.hpp"
 #include "yavog/client/FPSMessurement.hpp"
+#include "yavog/entity/EntityManager.hpp"
+#include "yavog/entity/SparseSet.hpp"
 #include "yavog/gui/GuiComponent.hpp"
 #include "yavog/gui/GuiScreen.hpp"
 #include "yavog/gui/GuiSystem.hpp"
@@ -29,9 +31,10 @@ public:
 
     //TMP
     std::shared_ptr<class Model> model;
-    glm::vec3 position = glm::vec3(0);
     float phi;
-    float theta;    
+    float theta;   
+    EntityManagerServer  entityManagerServer;
+    SparseSet<glm::vec3> entityPositions; 
 
 
     

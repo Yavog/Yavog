@@ -1,5 +1,7 @@
 #pragma  once
+#include "yavog/entity/EntityManager.hpp"
 #include "yavog/network/connection/Channel.hpp"
+#include <cstdint>
 
 struct Connection{
     Channel4TwoThread toServer;
@@ -9,4 +11,5 @@ struct Connection{
 };
 struct Player{
     std::shared_ptr<Connection> con;
+    Entity entity;
 };

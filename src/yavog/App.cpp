@@ -134,6 +134,8 @@ bool App::run(){
             //camera 
             if(vulkan.window.isMouseGrabbed())
                 world.camera.update(vulkan.window,fpsCounter.delta);  
+            
+            for(auto& position:entityPositions)
             {
                 glm::mat4 matrix(1);
                 matrix = glm::translate(matrix, position-glm::vec3(0,2,0));
@@ -144,7 +146,7 @@ bool App::run(){
                 model->draw(CB);
             }
             //if(!client.cnc.con->isClose)
-            client.pl.playerMovement.send(client.cnc.con->toServer, world.camera);
+            client.pl.playerMovement.sendServer(client.cnc.con->toServer, world.camera);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         guiSystem->draw(CB);

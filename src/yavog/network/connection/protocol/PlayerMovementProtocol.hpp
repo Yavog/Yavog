@@ -8,7 +8,7 @@ struct PlayerMovementProtocol:public ProtocolInterface{
     virtual void clientReceive(Channel4TwoThread& con,BinaryData& input)override;
     virtual void serverReceive(Player& player,BinaryData& input)override;
 
-    void send(Channel4TwoThread& con,Camera& camera){
+    void sendServer(Channel4TwoThread& con,Camera& camera){
         BinaryData bd;
         bd.writeU16(protocolId);
         bd.writef32(camera.pos.x);
@@ -18,9 +18,10 @@ struct PlayerMovementProtocol:public ProtocolInterface{
         bd.writef32(camera.theta);
         con.send(bd);
     }
-    void send(Channel4TwoThread& con,glm::vec3 pos,float phi,float theta){
+    void sendClient(Channel4TwoThread& con,Player& player,glm::vec3 pos,float phi,float theta){
         BinaryData bd;
         bd.writeU16(protocolId);
+        bd.writeU32(player.entity);
         bd.writef32(pos.x);
         bd.writef32(pos.y);
         bd.writef32(pos.z);

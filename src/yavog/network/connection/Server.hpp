@@ -33,5 +33,6 @@ public:
 
     [[nodiscard]] bool listen(std::size_t port);   
     void addPlayer(std::shared_ptr<Connection> con);    
+    void removePlayer(Player& con);    
     void update();
 };
