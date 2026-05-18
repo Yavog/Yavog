@@ -40,7 +40,8 @@ VertexOutput vertMain(VSInput input,uint vid : SV_VertexID,uint iid :SV_Instance
 float4 fragMain(VertexOutput inVert) : SV_Target
 {
     float3 color = inVert.color;
-    
+    color = texture.Sample(inVert.fragTexCoord).xyz;
+
     float3 dx = ddx(inVert.pos);
     float3 dy = ddy(inVert.pos);
     float3 normal = normalize(cross(dx, dy));
@@ -55,7 +56,6 @@ float4 fragMain(VertexOutput inVert) : SV_Target
     } else {
         color *= 0.8;
     }
-    color = texture.Sample(inVert.fragTexCoord).xyz;
 
     return float4(color,1);
 }
