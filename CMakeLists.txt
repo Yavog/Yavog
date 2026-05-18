@@ -170,13 +170,17 @@ file(GLOB_RECURSE SHADER_SLANG_SOURCES_TEXT CONFIGURE_DEPENDS
        ${PROJECT_SOURCE_DIR}/shaders/text.slang)
 file(GLOB_RECURSE SHADER_SLANG_SOURCES_MODEL CONFIGURE_DEPENDS
        ${PROJECT_SOURCE_DIR}/shaders/model.slang)
+file(GLOB_RECURSE SHADER_SLANG_SOURCES_CHUNK CONFIGURE_DEPENDS
+       ${PROJECT_SOURCE_DIR}/shaders/chunk.slang)
 
 
 add_slang_shader_target( shaders SOURCES ${SHADER_SLANG_SOURCES} OUT slang)
 add_slang_shader_target( shaders_gui SOURCES ${SHADER_SLANG_SOURCES_GUI} OUT gui)
 add_slang_shader_target( shaders_text SOURCES ${SHADER_SLANG_SOURCES_TEXT} OUT text)
 add_slang_shader_target( shaders_model SOURCES ${SHADER_SLANG_SOURCES_MODEL} OUT model)
+add_slang_shader_target( shaders_chunk SOURCES ${SHADER_SLANG_SOURCES_CHUNK} OUT chunk)
 add_dependencies(YAVOG shaders)
 add_dependencies(YAVOG shaders_gui)
 add_dependencies(YAVOG shaders_text)
 add_dependencies(YAVOG shaders_model)
+add_dependencies(YAVOG shaders_chunk)

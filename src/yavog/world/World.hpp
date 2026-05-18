@@ -7,10 +7,11 @@
 #include "yavog/vulkan/draw/Pipeline.hpp"
 #include "yavog/vulkan/draw/PushContant.hpp"
 #include "yavog/vulkan_old/Image.hpp"
+#include <memory>
 
 class World{
 public:
-    Image image;
+    std::shared_ptr<Image> image = std::make_shared<Image>();
     DescriptorSetLayout dsLayout;
     DescriptorSet ds;
     Camera camera;
@@ -25,22 +26,24 @@ public:
 
     void init(Vulkan& vulkan,std::filesystem::path projectBaseDir){
         
-        image.create(&vulkan.render,vulkan.commandPool,projectBaseDir/"assets"/"texture.jpg");
+        image->create(&vulkan.render,vulkan.commandPool,
+            projectBaseDir/"assets"/"block"/"textureAtlas.png");
         
         camera.create(vulkan.device,&vulkan.render);
         dsLayout.create(vulkan.device,{
             DescriptorLayout(0,vk::ShaderStageFlagBits::eVertex  ,vk::DescriptorType::eUniformBuffer),
-            //DescriptorLayout(1,vk::ShaderStageFlagBits::eFragment,vk::DescriptorType::eCombinedImageSampler),
+            DescriptorLayout(1,vk::ShaderStageFlagBits::eFragment,vk::DescriptorType::eCombinedImageSampler),
         });
         ds.create(vulkan.device,&vulkan.render,dsLayout,{
             DescriptorLayout(0,vk::ShaderStageFlagBits::eVertex  ,vk::DescriptorType::eUniformBuffer),
-            //Descriptor(1,vk::ShaderStageFlagBits::eFragment,image),
+            DescriptorLayout(1,vk::ShaderStageFlagBits::eFragment,vk::DescriptorType::eCombinedImageSampler),
         });
         ds.setResource(0, camera.ubo);
+        ds.setResource(1, image);
 
         pushConstant.create(vk::ShaderStageFlagBits::eVertex, 0, sizeof(WorldPushConstant));
         pipeline.create(&vulkan.render,vulkan.device,
-            projectBaseDir/"bin"/"shaders"/"slang.spv",
+            projectBaseDir/"bin"/"shaders"/"chunk.spv",
             "vertMain","fragMain",
             vulkan.swapchain, dsLayout,vulkan.depthBuffer,true,
             &pushConstant

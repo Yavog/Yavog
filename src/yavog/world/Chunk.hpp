@@ -2,10 +2,11 @@
 
 
 #include "yavog/App.hpp"
-#include "yavog/client/MeshWeaver.hpp"
 #include "yavog/data/BinaryData.hpp"
 #include "yavog/vulkan/draw/Buffer.hpp"
 #include "yavog/vulkan/draw/Pipeline.hpp"
+#include "yavog/world/MeshWeaver.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 typedef uint16_t BlockType;
@@ -51,8 +52,9 @@ public:
 
     //TODO refactor this:
     Buffer vertexBuffer,indexBuffer;
-    std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
+    // std::vector<Vertex> vertices;
+    // std::vector<uint16_t> indices;
+    size_t indices = 0;
 
     void create(){
         RenderSync* render = &App::app->vulkan.render;
@@ -74,24 +76,27 @@ public:
             }
             
             auto t1 = std::chrono::steady_clock::now();
-            mw.create(data,0,0,0);
+            //mw.create(data,0,0,0);
+            mw.create(*this);
             auto t2 =  std::chrono::steady_clock::now();
-            std::cout <<"mesh generation time:"<< std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count()<<"µs" <<std::endl;
+            //std::cout <<"mesh generation time:"<< std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count()<<"µs" <<std::endl;
         }
-        vertices = *(std::vector<Vertex>*)&mw.vertices; // me being a bad boy. Because i am lazy.
-        indices = mw.index;
+        //vertices = *(std::vector<Vertex>*)&mw.vertices; // me being a bad boy. Because i am lazy.
+        indices = mw.iIndex;
+        // vertices.resize(mw.vIndex);
+        // indices .resize(mw.iIndex);
 
-        if(indices.size()){
-            vertexBuffer.createAndUpload(render,pool,vertices.data(),vertices.size()*sizeof(Vertex),vk::BufferUsageFlagBits::eVertexBuffer);
-            indexBuffer.createAndUpload(  render,pool,indices.data(),indices.size() *sizeof(uint16_t),vk::BufferUsageFlagBits::eIndexBuffer);
+        if(indices){
+            vertexBuffer.createAndUpload( render,pool,mw.vertices,mw.vIndex*sizeof(Vertex),vk::BufferUsageFlagBits::eVertexBuffer);
+            indexBuffer.createAndUpload(  render,pool,mw.index,mw.iIndex *sizeof(uint16_t),vk::BufferUsageFlagBits::eIndexBuffer);
         }
     }
     void draw(CommandBuffer& buffer){
-        if(indices.size()){
+        if(indices){
             auto& commandBuffer = buffer.commandBuffer;
             commandBuffer.bindVertexBuffers(0, *vertexBuffer.buffer, {0});
             commandBuffer.bindIndexBuffer(*indexBuffer.buffer, 0, vk::IndexType::eUint16);
-            commandBuffer.drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0,0);
+            commandBuffer.drawIndexed(static_cast<uint32_t>(indices), 1, 0, 0,0);
         }
     }
     
