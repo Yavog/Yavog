@@ -39,10 +39,22 @@ class MeshWeaver
     const uint8_t orderNegatvie[6] = {0, 3, 2, 2, 1, 0};
 public:    
     static constexpr int chunkSize = 31;
-    Vertex vertices[32768];
-    uint16_t index[32768];
+    Vertex* vertices = new Vertex[589824];
+    uint16_t* index  = new uint16_t[589824];
+    MeshWeaver()=default;
+   
+    MeshWeaver           (const MeshWeaver&)=delete;
+    MeshWeaver& operator=(const MeshWeaver&)=delete;
+    MeshWeaver           (MeshWeaver&&)=delete;
+    MeshWeaver& operator=(MeshWeaver&&)=delete;
 
+    ~MeshWeaver(){
+        delete[] vertices;
+        delete[] index;
+    }
     size_t vIndex = 0;
     size_t iIndex = 0;
     void create(class Chunk& chunk);
+
+    static MeshWeaver mw;
 };

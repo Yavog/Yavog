@@ -6,6 +6,7 @@
 #include "yavog/vulkan/draw/Buffer.hpp"
 #include "yavog/vulkan/draw/Pipeline.hpp"
 #include "yavog/world/MeshWeaver.hpp"
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -15,6 +16,7 @@ struct Block{
     BlockType type;
     BlockData data;
 };
+
 class Chunk{
 public:
     static const uint32_t chunkSize = 32;
@@ -57,10 +59,10 @@ public:
     size_t indices = 0;
 
     void create(){
+        MeshWeaver& mw = MeshWeaver::mw;
         RenderSync* render = &App::app->vulkan.render;
         Device& device = App::app->vulkan.device;
         CommandPool& pool = App::app->vulkan.commandPool;
-        MeshWeaver mw;
         {
             char* data = new char[33*33*33];
             for (size_t x = 0; x < 33; x++){
@@ -87,6 +89,7 @@ public:
         // indices .resize(mw.iIndex);
 
         if(indices){
+            assert(mw.vIndex < 11901677568);
             vertexBuffer.createAndUpload( render,pool,mw.vertices,mw.vIndex*sizeof(Vertex),vk::BufferUsageFlagBits::eVertexBuffer);
             indexBuffer.createAndUpload(  render,pool,mw.index,mw.iIndex *sizeof(uint16_t),vk::BufferUsageFlagBits::eIndexBuffer);
         }

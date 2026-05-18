@@ -3,6 +3,7 @@
 #include "yavog/gui/GuiAsset.hpp"
 #include "yavog/world/Chunk.hpp"
 #include <atomic>
+#include <cassert>
 
 void MeshWeaver::create(class Chunk& chunk){
     auto t1 = std::chrono::steady_clock::now();
@@ -74,6 +75,8 @@ void MeshWeaver::create(class Chunk& chunk){
                                 index[iIndex++] = (verticeIndex+i);
                             }
                         }
+                        assert(iIndex < 589824);
+                        assert(vIndex < 589824);
                     }
                 }
 
@@ -84,3 +87,4 @@ void MeshWeaver::create(class Chunk& chunk){
     auto ms = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
     std::cout <<"mesh generation: "<< ms <<"µs"<<std::endl;
 }
+MeshWeaver MeshWeaver::mw;
