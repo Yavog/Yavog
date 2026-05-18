@@ -68,6 +68,7 @@ App::~App(){
     app = nullptr;
 }
 
+std::chrono::time_point<std::chrono::steady_clock> tmp; //tmp
 
 bool App::run(){    
     std::cout<<projectDir<<std::endl;
@@ -146,8 +147,10 @@ bool App::run(){
                 model->draw(CB);
             }
             //if(!client.cnc.con->isClose)
-            client.pl.playerMovement.sendServer(client.cnc.con->toServer, world.camera);
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            if(tmp+std::chrono::milliseconds(10) < std::chrono::steady_clock::now()){
+                tmp = std::chrono::steady_clock::now();
+                client.pl.playerMovement.sendServer(client.cnc.con->toServer, world.camera);
+            }
         }
         guiSystem->draw(CB);
 
