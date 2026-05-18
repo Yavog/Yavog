@@ -75,5 +75,8 @@
         "--clang-tidy",
         "--completion-style=detailed",
         "--compile-commands-dir=build/linux"
+    ],
+    "cmake.buildArgs": [
+        "-j24"
     ]
 }

@@ -34,8 +34,16 @@ void MeshWeaver::create(class Chunk& chunk){
                             else{
                                 uvBase = glm::vec2(2,0);
                             }
-                        }else
-                            uvBase = glm::vec2(1,0);
+                        }else{
+                            const Block upperBlock = lookFromPositive?
+                                chunk.chunkData[x][y+1][z]:
+                                chunk.chunkData[x+n.x][y+1][z+n.z];
+
+                            if(upperBlock.type == lookFromPositive?block.type:block2.type)
+                                uvBase = glm::vec2(2,0);
+                            else
+                                uvBase = glm::vec2(1,0);
+                        }
 
                         vertices[vIndex++] = {
                             .pos = pos+LUTfaces[j][0],
