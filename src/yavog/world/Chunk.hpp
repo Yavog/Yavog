@@ -1,15 +1,19 @@
 #pragma once
 
 
+#include "glm/ext/vector_float3.hpp"
 #include "yavog/App.hpp"
 #include "yavog/data/BinaryData.hpp"
 #include "yavog/vulkan/draw/Buffer.hpp"
 #include "yavog/vulkan/draw/Pipeline.hpp"
 #include "yavog/world/MeshWeaver.hpp"
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <limits>
 typedef uint16_t BlockType;
 typedef uint16_t BlockData;
 struct Block{
@@ -102,5 +106,54 @@ public:
             commandBuffer.drawIndexed(static_cast<uint32_t>(indices), 1, 0, 0,0);
         }
     }
-    
+    struct Box{
+        glm::vec3 start;
+        glm::vec3 end;
+    };
+    glm::vec3 aabb(const Box& a,const Box& b,glm::vec3 bVelocity){
+        glm::vec3 t;
+        for (int i = 0; i < 3 ; i++) {
+            if(bVelocity[i] > 0){
+                t[i] = (a.start[i]-b.end[i])/bVelocity[i];
+            }else if(bVelocity[i] < 0){
+                t[i] = (b.start[i]-a.end[i])/abs(bVelocity[i]);
+            }else {
+                if(a.start[i] < b.end[i] && b.start[i] < a.end[i])
+                    t[i] = 0;
+                else
+                    t[i] = std::numeric_limits<float>::max();
+            }
+            if(t[i] < 0){
+                if(a.start[i] < b.end[i] && b.start[i] < a.end[i])
+                    t[i] = 0;
+                else
+                    t[i] = std::numeric_limits<float>::max();
+            }
+        }
+        return t;
+    }
+    glm::vec3 collision(glm::vec3 position,glm::vec3 size,glm::vec3 velocity){
+        auto end = position+size;
+        glm::vec3 tNextCollVec = glm::vec3(std::numeric_limits<float>::max());
+        float tNextColl = std::numeric_limits<float>::max();
+        for (int x = std::floor(position.x-1); x <= std::ceil(end.x); x++) {
+            for (int y = std::floor(position.y-1); y <= std::ceil(end.y); y++) {
+                for (int z = std::floor(position.z-1); z <= std::ceil(end.z); z++) {
+                    if(0 <= x && x < chunkSize && 0 <= y && y < chunkSize && 0 <= z && z < chunkSize){
+                        auto block = chunkData[x][y][z];
+                        if(block.type == 1){
+                            auto tCollVec = aabb({.start = glm::vec3(x,y,z),.end = glm::vec3(x+1,y+1,z+1)},
+                             {.start = position,.end = end}, velocity);
+                            auto tColl = std::max({tCollVec[0], tCollVec[1],tCollVec[2]});
+                            if( tNextColl > tColl){
+                               tNextColl = tColl;
+                               tNextCollVec = tCollVec;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return tNextCollVec;
+    }
 };

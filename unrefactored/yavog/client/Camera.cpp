@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "glm/ext/vector_float3.hpp"
 
 void Camera::update(Window& window, float delta){
 
@@ -26,26 +27,27 @@ void Camera::update(Window& window, float delta){
     if(glfwGetKey(window,GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
         speed = 20.f;
     }
+    velocity = glm::vec3(0);
     {
         auto forward = glm::normalize(glm::vec3(this->forward.x,0,this->forward.z));
         auto right   = glm::normalize(glm::vec3(this->right.x  ,0,this->right.z  ));
         if(glfwGetKey(window,GLFW_KEY_W) == GLFW_PRESS){
-            pos += forward*delta*speed;
+            velocity += forward*speed;
         }
         if(glfwGetKey(window,GLFW_KEY_S) == GLFW_PRESS){
-            pos -= forward*delta*speed;
+            velocity -= forward*speed;
         }
         if(glfwGetKey(window,GLFW_KEY_D) == GLFW_PRESS){
-            pos += right*delta*speed;
+            velocity += right*speed;
         }
         if(glfwGetKey(window,GLFW_KEY_A) == GLFW_PRESS){
-            pos -= right*delta*speed;
+            velocity -= right*speed;
         }
     }
     if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS){
-        pos += glm::vec3(0.f,1.f,0.f)*delta*speed;
+        velocity += glm::vec3(0.f,1.f,0.f)*speed;
     }
     if(glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
-        pos -= glm::vec3(0.f,1.f,0.f)*delta*speed;
+        velocity -= glm::vec3(0.f,1.f,0.f)*speed;
     }
 }

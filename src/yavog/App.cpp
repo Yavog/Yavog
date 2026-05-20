@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
@@ -12,6 +13,7 @@
 #include <thread>
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "yavog/client/Camera.hpp"
 #include "yavog/gui/screen/MainMenu.hpp"
 #include "yavog/vulkan/draw/PushContant.hpp"
 #include "yavog/world/Chunk.hpp"
@@ -135,6 +137,28 @@ bool App::run(){
             //camera 
             if(vulkan.window.isMouseGrabbed())
                 world.camera.update(vulkan.window,fpsCounter.delta);  
+            for (int k = 0; k<3; k++) {
+            
+                auto tColl = chunk->collision(world.camera.pos-glm::vec3(0.5,1.75,0.5),glm::vec3(1,2,1),world.camera.velocity);
+                auto t = std::max({tColl[0],tColl[1],tColl[2]});
+                std::cout <<t <<"\t"<< tColl[0] << "\t" << tColl[1] << "\t" << tColl[2] << std::endl;
+                
+                if(t <= fpsCounter.delta){
+                    
+                    int i = 0;
+                    t = 0;
+                    for (int j = 0; j<3; j++) {
+                        if(tColl[j]>t){
+                            t = tColl[j];
+                            i = j;
+                        }
+                    }
+                    world.camera.velocity[i] *= 0;
+                    
+                }else break;
+            }
+            world.camera.pos += world.camera.velocity*fpsCounter.delta;
+            
             
             for(auto& movement:entityMovement)
             {
@@ -152,6 +176,9 @@ bool App::run(){
                 client.pl.playerMovement.sendServer(client.cnc.con->toServer, world.camera);
             }
         }
+        
+        
+
         guiSystem->draw(CB);
 
 

@@ -20,6 +20,7 @@ public:
         ubo->create(render,device,sizeof(UniformBufferObject));
     }
 
+    glm::vec3 velocity;
     glm::vec3 pos = glm::vec3(1.0f, 5.0f, 5.0f);
     glm::vec3 forward = glm::vec3(0.0f, -1.0f, -1.0f);
     glm::vec3 right = glm::vec3(-1.0f, -1.0f, 0.0f);
