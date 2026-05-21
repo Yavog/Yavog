@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "GLFW/glfw3.h"
 #include "glm/ext/vector_float3.hpp"
 
 void Camera::update(Window& window, float delta){
@@ -27,7 +28,9 @@ void Camera::update(Window& window, float delta){
     if(glfwGetKey(window,GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
         speed = 20.f;
     }
-    velocity = glm::vec3(0);
+    
+    velocity.x = 0;
+    velocity.z = 0;
     {
         auto forward = glm::normalize(glm::vec3(this->forward.x,0,this->forward.z));
         auto right   = glm::normalize(glm::vec3(this->right.x  ,0,this->right.z  ));
@@ -45,7 +48,7 @@ void Camera::update(Window& window, float delta){
         }
     }
     if(glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS){
-        velocity += glm::vec3(0.f,1.f,0.f)*speed;
+        velocity += glm::vec3(0.f,1.f,0.f)*speed*delta*4.f;
     }
     if(glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
         velocity -= glm::vec3(0.f,1.f,0.f)*speed;

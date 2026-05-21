@@ -16,6 +16,7 @@
 #include "yavog/client/Camera.hpp"
 #include "yavog/gui/screen/MainMenu.hpp"
 #include "yavog/vulkan/draw/PushContant.hpp"
+#include "yavog/vulkan/window/Window.hpp"
 #include "yavog/world/Chunk.hpp"
 #include "yavog/vulkan/model/Model.hpp"
 #include "yavog/world/World.hpp"
@@ -135,15 +136,22 @@ bool App::run(){
             }
 
             //camera 
+            world.camera.velocity  -= glm::vec3(0.f,1.f,0.f)*9.81f*fpsCounter.delta;
             if(vulkan.window.isMouseGrabbed())
                 world.camera.update(vulkan.window,fpsCounter.delta);  
+
+            if(glfwGetKey(vulkan.window, GLFW_KEY_F)){
+                world.camera.velocity.y = 0;
+                world.camera.pos.y = 32;
+            }
+            //std::cout << world.camera.velocity.y << std::endl;
             for (int k = 0; k<3; k++) {
             
-                auto tColl = chunk->collision(world.camera.pos-glm::vec3(0.5,1.75,0.5),glm::vec3(1,2,1),world.camera.velocity);
+                auto tColl = chunk->collision(world.camera.pos-glm::vec3(0.40,1.75,0.40),glm::vec3(0.8,1.8,0.8),world.camera.velocity);
                 auto t = std::max({tColl[0],tColl[1],tColl[2]});
-                std::cout <<t <<"\t"<< tColl[0] << "\t" << tColl[1] << "\t" << tColl[2] << std::endl;
+                //std::cout <<t <<"\t"<< tColl[0] << "\t" << tColl[1] << "\t" << tColl[2] << std::endl;
                 
-                if(t <= fpsCounter.delta){
+                if(t <= fpsCounter.delta*2){
                     
                     int i = 0;
                     t = 0;
@@ -153,12 +161,12 @@ bool App::run(){
                             i = j;
                         }
                     }
-                    world.camera.velocity[i] *= 0;
+                    world.camera.velocity[i] *= -0.1;
                     
                 }else break;
             }
             world.camera.pos += world.camera.velocity*fpsCounter.delta;
-            
+
             
             for(auto& movement:entityMovement)
             {
