@@ -13,13 +13,15 @@
 #include <thread>
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/ext/vector_int3.hpp"
+#include "glm/geometric.hpp"
 #include "yavog/client/Camera.hpp"
 #include "yavog/gui/screen/MainMenu.hpp"
 #include "yavog/vulkan/draw/PushContant.hpp"
 #include "yavog/vulkan/window/Window.hpp"
 #include "yavog/world/Chunk.hpp"
 #include "yavog/vulkan/model/Model.hpp"
-#include "yavog/world/World.hpp"
+#include "yavog/world/ChunkDrawer.hpp"
 
 App* App::app = nullptr;
 
@@ -72,6 +74,8 @@ App::~App(){
 }
 
 std::chrono::time_point<std::chrono::steady_clock> tmp; //tmp
+std::chrono::time_point<std::chrono::steady_clock> lastPlace(std::chrono::milliseconds(0)),lastBreak(std::chrono::milliseconds(0)); //tmp
+
 
 bool App::run(){    
     std::cout<<projectDir<<std::endl;
@@ -79,11 +83,11 @@ bool App::run(){
     guiSystem->create(projectDir);
     vulkan.window.inputHandler = guiSystem;
 
-    world.init(vulkan, projectDir);
+    chunkDrawer.init(vulkan, projectDir);
     
 
     model = std::make_shared<Model>();
-    model->create( projectDir/"assets"/"model"/"Human.glb",projectDir,world.camera);
+    model->create( projectDir/"assets"/"model"/"Human.glb",projectDir,chunkDrawer.camera);
     
     while (vulkan.window.update()) {
         
@@ -128,26 +132,26 @@ bool App::run(){
 
         //TODO: TMP
         {
-            world.draw(vulkan,CB, imageIndex);
+            chunkDrawer.draw(vulkan,CB, imageIndex);
             if(chunk){
                 
-                world.pushConstant.use(CB, world.pipeline, World::WorldPushConstant{.position = glm::vec3(0)});
+                chunkDrawer.pushConstant.use(CB, chunkDrawer.pipeline, ChunkDrawer::WorldPushConstant{.position = glm::vec3(0)});
                 chunk->draw(CB);
+                
+                //camera 
+                chunkDrawer.camera.velocity  -= glm::vec3(0.f,1.f,0.f)*9.81f*fpsCounter.delta;
             }
-
-            //camera 
-            world.camera.velocity  -= glm::vec3(0.f,1.f,0.f)*9.81f*fpsCounter.delta;
             if(vulkan.window.isMouseGrabbed())
-                world.camera.update(vulkan.window,fpsCounter.delta);  
+                chunkDrawer.camera.update(vulkan.window,fpsCounter.delta);  
 
             if(glfwGetKey(vulkan.window, GLFW_KEY_F)){
-                world.camera.velocity.y = 0;
-                world.camera.pos.y = 32;
+                chunkDrawer.camera.velocity.y = 0;
+                chunkDrawer.camera.pos.y = 32;
             }
             //std::cout << world.camera.velocity.y << std::endl;
             for (int k = 0; k<3; k++) {
             
-                auto tColl = chunk->collision(world.camera.pos-glm::vec3(0.40,1.75,0.40),glm::vec3(0.8,1.8,0.8),world.camera.velocity);
+                auto tColl = chunk->collision(chunkDrawer.camera.pos-glm::vec3(0.40,1.75,0.40),glm::vec3(0.8,1.8,0.8),chunkDrawer.camera.velocity);
                 auto t = std::max({tColl[0],tColl[1],tColl[2]});
                 //std::cout <<t <<"\t"<< tColl[0] << "\t" << tColl[1] << "\t" << tColl[2] << std::endl;
                 
@@ -161,13 +165,41 @@ bool App::run(){
                             i = j;
                         }
                     }
-                    world.camera.velocity[i] *= -0.1;
+                    chunkDrawer.camera.velocity[i] *= -0.1;
                     
                 }else break;
             }
-            world.camera.pos += world.camera.velocity*fpsCounter.delta;
+            chunkDrawer.camera.pos += chunkDrawer.camera.velocity*fpsCounter.delta;
 
-            
+            auto ray = chunk->ray(chunkDrawer.camera.pos, chunkDrawer.camera.forward);
+            if(ray.available)
+            {
+                //std::cout << ray.breakPosition[0] <<"\t"<< ray.breakPosition[1] <<"\t"<< ray.breakPosition[2] <<"\t"<<std::endl;
+                std::cout << ray.placePosition[0] <<"\t"<< ray.placePosition[1] <<"\t"<< ray.placePosition[2] <<"\t"<<std::endl;
+                if(glfwGetMouseButton(vulkan.window, GLFW_MOUSE_BUTTON_LEFT) && lastBreak + std::chrono::milliseconds(200)< std::chrono::steady_clock::now()){
+                    lastBreak = std::chrono::steady_clock::now();
+                    
+                    chunk->chunkData[ray.breakPosition[0]][ray.breakPosition[1]][ray.breakPosition[2]].type = 0;
+                    chunk->create();
+                }
+                else if(glfwGetMouseButton(vulkan.window, GLFW_MOUSE_BUTTON_RIGHT) && lastPlace + std::chrono::milliseconds(200)< std::chrono::steady_clock::now()){
+                    lastPlace = std::chrono::steady_clock::now();
+                    
+                    auto tv = chunk->aabb({
+                        .start = ray.placePosition,
+                        .end = ray.placePosition+glm::ivec3(1,1,1),
+                    }, {
+                        .start = chunkDrawer.camera.pos-glm::vec3(0.40,1.75,0.40),
+                        .end   = chunkDrawer.camera.pos-glm::vec3(0.40,1.75,0.40)+glm::vec3(0.8,1.8,0.8)
+                    }, chunkDrawer.camera.velocity);
+                    auto t = std::max({tv[0],tv[1],tv[2]});
+                    if(t > fpsCounter.delta*2){
+                        chunk->chunkData[ray.placePosition[0]][ray.placePosition[1]][ray.placePosition[2]].type = 1;
+                        chunk->create();
+                    }
+                }
+            }
+           
             for(auto& movement:entityMovement)
             {
                 glm::mat4 matrix(1);
@@ -181,7 +213,7 @@ bool App::run(){
             //if(!client.cnc.con->isClose)
             if(tmp+std::chrono::milliseconds(10) < std::chrono::steady_clock::now()){
                 tmp = std::chrono::steady_clock::now();
-                client.pl.playerMovement.sendServer(client.cnc.con->toServer, world.camera);
+                client.pl.playerMovement.sendServer(client.cnc.con->toServer, chunkDrawer.camera);
             }
         }
         

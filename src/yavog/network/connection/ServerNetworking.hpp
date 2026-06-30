@@ -13,7 +13,7 @@
 
 
 
-class Server{
+class ServerNetworking{
     //all of this  is owned by the network thread
     struct NetworkConnection{
         std::shared_ptr<Connection> con;

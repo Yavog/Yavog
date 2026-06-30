@@ -4,7 +4,7 @@
 #include "yavog/gui/screen/MainMenu.hpp"
 #include "yavog/gui/screen/MultiplayerMenu.hpp"
 #include "yavog/network/connection/Client.hpp"
-#include "yavog/network/connection/Server.hpp"
+#include "yavog/network/connection/ServerNetworking.hpp"
 #include <cstddef>
 #include <exception>
 #include <string>
@@ -18,33 +18,33 @@ MultiplayerHostMenu::~MultiplayerHostMenu(){
 
 void MultiplayerHostMenu::create(){
     username.defaultText = u8"Enter name of sacrifice";
-    port.defaultText = u8"Enter Port";
+    port    .defaultText = u8"Enter Port";
 
     back    .setString(u8"Back");
     host    .setString(u8"Host");
     username.setString(u8"");
-    port.setString(u8"");
+    port    .setString(u8"");
 
     back    .setSize(60);
     host    .setSize(60);
     username.setSize(60);
-    port.setSize(60);
+    port    .setSize(60);
 
     back    .position = glm::vec2(0,0);
     host    .position = glm::vec2(1200,900);
     username.position = glm::vec2(300,420);
-    port.position = glm::vec2(300,300);
+    port    .position = glm::vec2(300,300);
 
     back    .color = colorDefault;
     host    .color = colorDefault;
     username.color = colorEditable;
-    port.color = colorEditable;
+    port    .color = colorEditable;
 }
 void MultiplayerHostMenu::draw(CommandBuffer& CB, glm::vec2 mouse){
     back    .draw(CB,virtualScreenSize);
     host    .draw(CB,virtualScreenSize);
     username.draw(CB,virtualScreenSize);
-    port.draw(CB,virtualScreenSize);
+    port    .draw(CB,virtualScreenSize);
 
     TextGui* texts[] = {&username,&port,&host,&back};
     TextGui* hovered = nullptr;
@@ -105,14 +105,14 @@ bool MultiplayerHostMenu::receive(const Event& event){
                     return true;
                 }
 
-                Server& server = App::app->server;
+                ServerNetworking& server = App::app->server;
                 if(!server.listen(portNumber)){
                     port.setString(u8"couldn't use this port.");
                     port.text.string.clear();
                     port.color = colorInvalid;
                     return true;
                 }
-                Client& client = App::app->client;
+                ClientNetworking& client = App::app->client;
                 auto ip = U"localhost:"+port.text.string;
                 if(!client.join(ip)){
                     exit(0);

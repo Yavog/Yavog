@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 #include "GLFW/glfw3.h"
 #include "glm/ext/vector_float3.hpp"
+#include <chrono>
 
 void Camera::update(Window& window, float delta){
 
@@ -51,6 +52,6 @@ void Camera::update(Window& window, float delta){
         velocity += glm::vec3(0.f,1.f,0.f)*speed*delta*4.f;
     }
     if(glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
-        velocity -= glm::vec3(0.f,1.f,0.f)*speed;
+        velocity -= glm::vec3(0.f,1.f,0.f)*speed*delta;
     }
 }

@@ -9,8 +9,9 @@
 #include "yavog/gui/GuiScreen.hpp"
 #include "yavog/gui/GuiSystem.hpp"
 #include "yavog/network/connection/Client.hpp"
-#include "yavog/network/connection/Server.hpp"
+#include "yavog/network/connection/ServerNetworking.hpp"
 #include "yavog/vulkan/Vulkan.hpp"
+#include "yavog/world/ChunkDrawer.hpp"
 #include "yavog/world/World.hpp"
 
 class App{
@@ -26,8 +27,8 @@ public:
     ///@return restart?
     bool run();
 
-    Server server;
-    Client client;
+    ServerNetworking server;
+    ClientNetworking client;
 
     //TMP
     std::shared_ptr<class Model> model;
@@ -36,14 +37,15 @@ public:
         float phi;
         float theta;   
     };
-    EntityManagerServer  entityManagerServer;
     
+    EntityManagerServer  entityManagerServer;
+
     SparseSet<Movement> entityMovement; 
-
-
+    
+    ServerWorld serverWorld;
     
     //TODO: tmp
-    World world;
+    ChunkDrawer chunkDrawer;
     std::shared_ptr<class Chunk> chunk;
 
     static App* app;

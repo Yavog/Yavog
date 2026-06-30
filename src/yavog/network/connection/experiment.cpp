@@ -3,7 +3,7 @@
 #include "yavog/data/BinaryData.hpp"
 #include "yavog/network/connection/ProtocolList.hpp"
 #include "yavog/network/connection/Client.hpp"
-#include "yavog/network/connection/Server.hpp"
+#include "yavog/network/connection/ServerNetworking.hpp"
 #include <memory>
 #include <stop_token>
 #include <string>
@@ -41,7 +41,7 @@ void client(std::stop_token token){
 int experimentServer(){
     //std::shared_ptr<Connection> host2 = std::make_shared<Connection>();
     {
-        Server server;
+        ServerNetworking server;
         // {
         //     server.addPlayer(host2);
         // }

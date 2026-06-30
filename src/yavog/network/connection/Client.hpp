@@ -3,7 +3,7 @@
 #include "yavog/network/basic/SocketPoll.hpp"
 #include "yavog/network/basic/TcpListener.hpp"
 #include "yavog/network/basic/TcpSocket.hpp"
-#include "yavog/network/connection/Server.hpp"
+#include "yavog/network/connection/ServerNetworking.hpp"
 #include <cstddef>
 #include <cuchar>
 #include <iostream>
@@ -26,7 +26,7 @@ struct ClientNetworkConnection{
     [[nodiscard]]bool update();
 };
 
-struct Client{
+struct ClientNetworking{
     ClientNetworkConnection cnc;
     ProtocolList pl;
 

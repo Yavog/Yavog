@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "ServerNetworking.hpp"
 #include "yavog/App.hpp"
 #include "yavog/data/BinaryData.hpp"
 #include "yavog/network/basic/SocketPoll.hpp"
@@ -16,7 +16,7 @@
 #include <thread>
 #include <vector>
 
-void Server::run(std::stop_token stoken,TcpListener listener){
+void ServerNetworking::run(std::stop_token stoken,TcpListener listener){
     SocketPoll poll;
     poll.add(listener);
         
@@ -107,7 +107,7 @@ void Server::run(std::stop_token stoken,TcpListener listener){
     listener.close();
 }
 
-bool Server::listen(size_t port){
+bool ServerNetworking::listen(size_t port){
     if(networkThread.joinable()){
         networkThread.request_stop();
         networkThread.join();
@@ -119,11 +119,11 @@ bool Server::listen(size_t port){
     if(!listener.listen(std::u8string(portStr.begin(),portStr.end())))
         return false;
     
-    networkThread = std::jthread(&Server::run,this, std::move(listener));
+    networkThread = std::jthread(&ServerNetworking::run,this, std::move(listener));
     return true;
 }
 time_t lastTime = 0;
-void Server::update(){
+void ServerNetworking::update(){
     std::lock_guard lock(mutex);
     for (size_t i = 0; i < players.size();) {
         auto& player = players[i];
@@ -153,7 +153,7 @@ void Server::update(){
     }
     
 }
-void Server::addPlayer(std::shared_ptr<Connection> con){
+void ServerNetworking::addPlayer(std::shared_ptr<Connection> con){
     std::lock_guard lock(mutex);
     Player player;
     player.con = con;
@@ -171,7 +171,7 @@ void Server::addPlayer(std::shared_ptr<Connection> con){
     procotolList.chunk.send(con->toClient, *App::app->chunk);
 }    
 
-void Server::removePlayer(Player& player){
+void ServerNetworking::removePlayer(Player& player){
     player.con->isClose = true;
 
     App::app->entityManagerServer.removeEntity(player.entity);

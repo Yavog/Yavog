@@ -1,7 +1,10 @@
 #pragma once
 
 
+#include "glm/common.hpp"
+#include "glm/ext/quaternion_geometric.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/ext/vector_int3.hpp"
 #include "yavog/App.hpp"
 #include "yavog/data/BinaryData.hpp"
 #include "yavog/vulkan/draw/Buffer.hpp"
@@ -14,6 +17,7 @@
 #include <cstdint>
 #include <iostream>
 #include <limits>
+#include <optional>
 typedef uint16_t BlockType;
 typedef uint16_t BlockData;
 struct Block{
@@ -155,5 +159,72 @@ public:
             }
         }
         return tNextCollVec;
+    }
+    struct RayResponse{
+        bool available = false;
+        glm::ivec3 breakPosition;
+        glm::ivec3 placePosition;
+    };
+    RayResponse ray(glm::vec3 _position, glm::vec3 _direction){
+        glm::vec3 position = _position;
+        glm::vec3 dir = glm::normalize(_direction);
+        glm::ivec3 pos = glm::floor(position);
+
+        glm::ivec3 lastAirposition = pos;
+
+        float range = std::numeric_limits<float>::max();
+        while(true){
+            if(glm::length(position-_position)>range)
+                return {.available = false};
+            if(0 <= pos.x && pos.x < chunkSize && 0 <= pos.y && pos.y < chunkSize && 0 <= pos.z && pos.z < chunkSize){
+                if(chunkData[pos.x][pos.y][pos.z].type == 1)
+                    return {
+                        .available = true,
+                        .breakPosition = pos,
+                        .placePosition = lastAirposition,
+                    };
+                else{
+                    lastAirposition = pos;
+                }
+            }else {
+                return {.available = false};
+            }
+
+            int   component = -1;
+            float tMin = std::numeric_limits<float>::max();
+            for(int i = 0; i< 3 ;){
+                float t;
+                if(dir[i]>0){
+                    t = (pos[i]+1-position[i])/dir[i];
+                }else if(dir[i]<0){
+                    t = (pos[i]-position[i])/dir[i];
+                }else{
+                    t = std::numeric_limits<float>::max();
+                }
+                // floating point error
+                if(t<0){
+                    if(dir[i]>0)
+                        pos[i] += 1;
+                    else 
+                        pos[i] -= 1;
+                    continue;
+                }
+                if(tMin>t){
+                    tMin = t;
+                    component = i;
+                }
+                i++;
+            }
+            if(component != -1 && dir[component] != 0){
+                if(dir[component] > 0)
+                    pos[component]      += 1;
+                else
+                    pos[component]      -= 1;
+
+                position += tMin*dir;
+            }else{
+                return {.available = false};
+            }
+        }
     }
 };

@@ -4,7 +4,7 @@
 #include "yavog/gui/screen/MainMenu.hpp"
 #include "yavog/gui/screen/MultiplayerMenu.hpp"
 #include "yavog/network/connection/Client.hpp"
-#include "yavog/network/connection/Server.hpp"
+#include "yavog/network/connection/ServerNetworking.hpp"
 #include <cstddef>
 #include <exception>
 #include <string>
@@ -93,7 +93,7 @@ bool MultiplayerJoinMenu::receive(const Event& event){
                     return true;
                 }
 
-                Client& client = App::app->client;
+                ClientNetworking& client = App::app->client;
 
                 
                 if(!client.join(serverIp.text.string)){
